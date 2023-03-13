@@ -1,6 +1,7 @@
 import numpy as np
 import os
-from tqdm.notebook import tqdm
+from tqdm.autonotebook import tqdm, trange
+from tqdm.contrib import tenumerate
 
 import warnings
 
@@ -36,7 +37,7 @@ def data_augment_(data, n: int, load_on_gpu=False):
         return None
 
     original_dataset_lenght = len(data)
-    for idx in tqdm(range(original_dataset_lenght), desc="Expending the dataset {} more times".format(n)):
+    for idx in trange(original_dataset_lenght, desc="Expending the dataset {} more times".format(n)):
         img, mask, original_file = data[idx]
         for i_n in range(n):
             new_img = img.detach().clone()
@@ -143,7 +144,7 @@ class POCDataReader(object):
             print("Cannot load Dataset on GPU, cuda is not available.")
 
         self.data = {}
-        for i, (img_path, mask_path) in tqdm(enumerate(self._files), desc=f"Loading dataset into {'GPU' if self.load_on_gpu else 'RAM'}"):
+        for i, (img_path, mask_path) in tenumerate(self._files, desc=f"Loading dataset into {'GPU' if self.load_on_gpu else 'RAM'}", tqdm_class=tqdm):
             img = read_image(img_path, mode=ImageReadMode.GRAY)
             mask = read_image(mask_path, mode=ImageReadMode.GRAY).bool()
             file_name = os.path.basename(img_path)
