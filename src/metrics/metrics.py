@@ -11,11 +11,11 @@ from .tversky import TverskyIndex
 
 
 class Metrics(nn.Module):
-    def __init__(self, buffer_size, mode: str, net_name: str, loss_name: str, opt_name: str, batch_size: int, learning_rate: float, negative_mining: bool, soft_labels: bool, smooth=1e-7, device=None):
+    def __init__(self, buffer_size, mode: str, model_name: str, loss_name: str, opt_name: str, batch_size: int, learning_rate: float, negative_mining: bool, soft_labels: bool, smooth=1e-7, device=None):
         super(Metrics, self).__init__()
 
         self.device = device
-        self.hyperparameters = {"Model": net_name, "Loss function": loss_name, "Optimizer": opt_name, "Learning rate": learning_rate, "Batch size": batch_size, "Smooth Labeling": soft_labels, "Negative Mining": negative_mining}
+        self.hyperparameters = {"Model": model_name, "Loss function": loss_name, "Optimizer": opt_name, "Learning rate": learning_rate, "Batch size": batch_size, "Smooth Labeling": soft_labels, "Negative Mining": negative_mining}
         self.register_buffer("_losses", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
         # self.register_buffer("_scores_crack_Dice", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
         # self.register_buffer("_scores_mean_Dice", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
@@ -31,7 +31,7 @@ class Metrics(nn.Module):
 
         assert mode in ["Training", "Validation", "Evaluation"]
         flags = "" + ("-NM" if negative_mining else "") + ("-SL" if soft_labels else "")
-        self.log_folder = f"../logs/{net_name}-{loss_name}-{opt_name}-BS:{batch_size}-LR:{learning_rate:.1e}{flags}/{mode}"
+        self.log_folder = f"../logs/{model_name}-{loss_name}-{opt_name}-BS:{batch_size}-LR:{learning_rate:.1e}{flags}/{mode}"
         self.writer = SummaryWriter(self.log_folder, max_queue=4)
 
 
@@ -92,11 +92,11 @@ class Metrics(nn.Module):
 
 class EvaluationMetrics(Metrics):
     """docstring for EvaluationMetrics"""
-    def __init__(self, buffer_size, net_name: str, loss_name: str, opt_name: str, epochs: int, batch_size: int, learning_rate: float, negative_mining: bool, soft_labels: bool, smooth=1e-7, device=None):
+    def __init__(self, buffer_size, model_name: str, loss_name: str, opt_name: str, epochs: int, batch_size: int, learning_rate: float, negative_mining: bool, soft_labels: bool, smooth=1e-7, device=None):
         super(EvaluationMetrics, self).__init__(
             buffer_size,
             mode="Evaluation",
-            net_name=net_name,
+            model_name=model_name,
             loss_name=loss_name,
             opt_name=opt_name,
             batch_size=batch_size,
