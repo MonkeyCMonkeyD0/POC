@@ -1,7 +1,6 @@
 import numpy as np
 import os
 from tqdm.notebook import tqdm
-from tqdm.contrib import tenumerate
 
 import warnings
 
@@ -144,7 +143,7 @@ class POCDataReader(object):
             print("Cannot load Dataset on GPU, cuda is not available.")
 
         self.data = {}
-        for i, (img_path, mask_path) in tenumerate(self._files, desc=f"Loading dataset into {'GPU' if self.load_on_gpu else 'RAM'}", tqdm_class=tqdm):
+        for i, (img_path, mask_path) in tqdm(enumerate(self._files), desc=f"Loading dataset into {'GPU' if self.load_on_gpu else 'RAM'}"):
             img = read_image(img_path, mode=ImageReadMode.GRAY)
             mask = read_image(mask_path, mode=ImageReadMode.GRAY).bool()
             file_name = os.path.basename(img_path)
