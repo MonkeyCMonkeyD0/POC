@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from tqdm import tqdm
+from tqdm.autonotebook import tqdm, trange
 from tqdm.contrib import tenumerate
 
 import warnings
@@ -37,7 +37,7 @@ def data_augment_(data, n: int, load_on_gpu=False):
         return None
 
     original_dataset_lenght = len(data)
-    for idx in tqdm(range(original_dataset_lenght), desc="Expending the dataset {} more times".format(n)):
+    for idx in trange(original_dataset_lenght, desc="Expending the dataset {} more times".format(n)):
         img, mask, original_file = data[idx]
         for i_n in range(n):
             new_img = img.detach().clone()
