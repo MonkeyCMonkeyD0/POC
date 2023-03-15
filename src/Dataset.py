@@ -145,7 +145,7 @@ class POCDataReader(object):
 
         self.data = {}
         for i, (img_path, mask_path) in tenumerate(self._files, desc=f"Loading dataset into {'GPU' if self.load_on_gpu else 'RAM'}", tqdm_class=tqdm):
-            img = read_image(img_path, mode=ImageReadMode.GRAY)
+            img = read_image(img_path, mode=ImageReadMode.UNCHANGED)
             mask = read_image(mask_path, mode=ImageReadMode.GRAY).bool()
             file_name = os.path.basename(img_path)
             if self.load_on_gpu:

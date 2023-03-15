@@ -2,16 +2,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 import psutil
 import torch.cuda as tcuda
+from torch.nn.functional import softmax, normalize
 
 
 def show_img(tensors):
     fix, axs = plt.subplots(ncols=len(tensors), squeeze=False)
     for i, tensor in enumerate(tensors):
-        array = np.array((tensor[-1] * 255).cpu(), dtype=np.uint8)
-        if np.ndim(array) > 2:
-            assert array.shape[0] == 1
-            array = array[0]
-        axs[0, i].imshow(array, cmap='gray')
+        tensor = tensor.detach().cpu()
+        if tensor.size()[0] < 3:
+            tensor = tensor[-1]
+            array = np.array(255 * tensor / tensor.max(), dtype=np.uint8)
+            axs[0, i].imshow(array, cmap='gray')
+        else:
+            if tensor.size()[0] > 3:
+                tensor = tensor[0:3]
+            array = np.array(255 * tensor / tensor.max(), dtype=np.uint8)
+            axs[0, i].imshow(np.dstack(array))
+        
         axs[0, i].set(xticklabels=[], yticklabels=[], xticks=[], yticks=[])
 
 def get_gpu_mem_usage(complete=True):
