@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from tqdm.autonotebook import tqdm, trange
+from tqdm.auto import tqdm, trange
 from tqdm.contrib import tenumerate
 
 import warnings

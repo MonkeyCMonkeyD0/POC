@@ -26,18 +26,18 @@ class BorderedLoss(nn.Module):
         self.volume_loss = volume_loss
         self.ratio = ratio
         self.__class__.__name__ = f"(B:{self.border_loss.__class__.__name__}+V:{self.volume_loss.__class__.__name__})"
-        self.kernel = torch.Tensor([[[[-1, -1, -1],[-1, 8, -1],[-1, -1, -1]]]], )
+        self.register_buffer("kernel", torch.Tensor([[[[-1, -1, -1],[-1, 8, -1],[-1, -1, -1]]]]), persistent=False)
 
     def __repr__(self):
         return self.__class__.__name__
 
-    def to(self, device: str):
-        super(BorderedLoss, self).to(device)
-        self.kernel = self.kernel.to(device)
-        return self
+    # def to(self, device: str):
+    #     super(BorderedLoss, self).to(device)
+    #     self.kernel = self.kernel.to(device)
+    #     return self
 
     def create_border_mask(self, masks: torch.Tensor):
-        borders = F.conv2d(masks[:,1:], weight=self.kernel, padding='same')
+        borders = F.conv2d(masks[:,-1:], weight=self.kernel, padding='same')
         borders.clamp_(min=0., max=1.)
 
         return borders

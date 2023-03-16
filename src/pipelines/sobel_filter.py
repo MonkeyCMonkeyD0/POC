@@ -8,8 +8,8 @@ from torchvision.transforms import Pad
 class SobelFilter(nn.Module):
     def __init__(self):
         super().__init__()
-        self.filter_x = nn.Conv2d(in_channels=3, out_channels=1, groups=1, kernel_size=3, stride=1, padding=2, bias=False)
-        self.filter_y = nn.Conv2d(in_channels=3, out_channels=1, groups=1, kernel_size=3, stride=1, padding=2, bias=False)
+        self.filter_x = nn.Conv2d(in_channels=3, out_channels=1, groups=1, kernel_size=3, stride=1, padding='valid', bias=False)
+        self.filter_y = nn.Conv2d(in_channels=3, out_channels=1, groups=1, kernel_size=3, stride=1, padding='valid', bias=False)
 
         kernel_x = torch.tensor([
             [1., 0., -1.],

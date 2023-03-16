@@ -6,20 +6,27 @@ from torch.nn.functional import softmax, normalize
 
 
 def show_img(tensors):
-    fix, axs = plt.subplots(ncols=len(tensors), squeeze=False)
+    fix, axs = plt.subplots(ncols=len(tensors), nrows=max(tensors.size()[-3] - 2, 1), squeeze=False)
     for i, tensor in enumerate(tensors):
         tensor = tensor.detach().cpu()
-        if tensor.size()[0] < 3:
-            tensor = tensor[-1]
-            array = np.array(255 * tensor / tensor.max(), dtype=np.uint8)
+
+        img = tensor[0:3]
+        filters = tensor[3:]
+
+        if img.size()[0] < 3:
+            img = img[-1]
+            array = np.array(255 * img / img.max(), dtype=np.uint8)
             axs[0, i].imshow(array, cmap='gray')
         else:
-            if tensor.size()[0] > 3:
-                tensor = tensor[0:3]
-            array = np.array(255 * tensor / tensor.max(), dtype=np.uint8)
+            array = np.array(255 * img / img.max(), dtype=np.uint8)
             axs[0, i].imshow(np.dstack(array))
-        
         axs[0, i].set(xticklabels=[], yticklabels=[], xticks=[], yticks=[])
+
+        for j, layer in enumerate(filters):
+            array = np.array(255 * layer / layer.max(), dtype=np.uint8)
+            axs[j+1, i].imshow(array, cmap='gray')
+            axs[j+1, i].set(xticklabels=[], yticklabels=[], xticks=[], yticks=[])
+
 
 def get_gpu_mem_usage(complete=True):
     gpu_mem_free, gpu_mem_total = tcuda.mem_get_info()
