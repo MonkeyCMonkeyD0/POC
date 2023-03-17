@@ -20,6 +20,8 @@ class InputPipeline(nn.Module):
         else:
             self.layer_transformer = None
 
+        self._nb_channel = 3 + (len(self.layer_transformer) if self.layer_transformer is not None else 0)
+
 
     def forward(self, img):
         n_channel = img.size()[-3]
@@ -30,6 +32,10 @@ class InputPipeline(nn.Module):
                 new_channel = transform(img[0:n_channel])
                 img = torch.cat((img, new_channel), dim=-3) 
         return img
+
+    @property    
+    def nb_channel(self):
+        return self._nb_channel
 
     def __repr__(self) -> str:
         return "{}({}+{})".format(
