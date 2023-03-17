@@ -11,41 +11,29 @@ from .tversky import TverskyIndex
 
 
 class Metrics(nn.Module):
-    def __init__(self, buffer_size, mode: str, model_name: str, loss_name: str, opt_name: str, batch_size: int, learning_rate: float, negative_mining: bool, soft_labels: bool, smooth=1e-7, device=None):
+    def __init__(self, buffer_size, mode: str, model_name: str, loss_name: str, opt_name: str, pip_name: str, batch_size: int, learning_rate: float, negative_mining: bool, soft_labels: bool, smooth=1e-7, device=None):
         super(Metrics, self).__init__()
 
         self.device = device
-        self.hyperparameters = {"Model": model_name, "Loss function": loss_name, "Optimizer": opt_name, "Learning rate": learning_rate, "Batch size": batch_size, "Smooth Labeling": soft_labels, "Negative Mining": negative_mining}
+        self.hyperparameters = {"Model": model_name, "Loss function": loss_name, "Optimizer": opt_name, "Learning rate": learning_rate, "Batch size": batch_size, "Smooth Labeling": soft_labels, "Negative Mining": negative_mining, "Input Pipeline": pip_name}
         self.register_buffer("_losses", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
-        # self.register_buffer("_scores_crack_Dice", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
-        # self.register_buffer("_scores_mean_Dice", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
         self.register_buffer("_scores_crack_IOU", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
         self.register_buffer("_scores_mean_IOU", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
         self.register_buffer("_scores_Tversky", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
 
-        # self.diceCrackIndex = DiceIndex(mesure_background=False, smooth=smooth).to(self.device)
-        # self.diceMeanIndex = DiceIndex(mesure_background=True, smooth=smooth).to(self.device)
         self.jaccardCrackIndex = JaccardIndex(mesure_background=False, smooth=smooth).to(self.device)
         self.jaccardMeanIndex = JaccardIndex(mesure_background=True, smooth=smooth).to(self.device)
         self.tverskyIndex = TverskyIndex(alpha=.3, beta=.7, smooth=smooth).to(self.device)
 
         assert mode in ["Training", "Validation", "Evaluation"]
         flags = "" + ("-NM" if negative_mining else "") + ("-SL" if soft_labels else "")
-        self.log_folder = f"../logs/{model_name}-{loss_name}-{opt_name}-BS:{batch_size}-LR:{learning_rate:.1e}{flags}/{mode}"
+        self.log_folder = f"../logs/{model_name}-{loss_name}-{opt_name}-{pip_name}-BS:{batch_size}-LR:{learning_rate:.1e}{flags}/{mode}"
         self.writer = SummaryWriter(self.log_folder, max_queue=4)
 
 
     @property
     def loss(self):
         return self._losses.mean()
-
-    # @property
-    # def crackDice(self):
-    #     return self._scores_crack_Dice.mean()
-
-    # @property
-    # def meanDice(self):
-    #     return self._scores_mean_Dice.mean()
 
     @property
     def crackIoU(self):
@@ -67,8 +55,6 @@ class Metrics(nn.Module):
         preds, targets = preds.detach(), targets.detach()
 
         self._losses[batch_index] = loss_value
-        # self._scores_crack_Dice[batch_index] = self.diceCrackIndex.forward(preds, targets)
-        # self._scores_mean_Dice[batch_index] = self.diceMeanIndex.forward(preds, targets)
         self._scores_crack_IOU[batch_index] = self.jaccardCrackIndex.forward(preds, targets)
         self._scores_mean_IOU[batch_index] = self.jaccardMeanIndex.forward(preds, targets)
         self._scores_Tversky[batch_index] = self.tverskyIndex.forward(preds, targets)
@@ -79,8 +65,6 @@ class Metrics(nn.Module):
         self.writer.add_scalar(f"Losses/{self.hyperparameters['Loss function']}", self.loss, epoch, new_style=True)
         self.writer.add_scalar("Indexes/Crack IOU", self.crackIoU, epoch, new_style=True)
         self.writer.add_scalar("Indexes/Mean IOU", self.meanIoU, epoch, new_style=True)
-        # self.writer.add_scalar("Indexes/Crack Dice", self.crackDice, epoch, new_style=True)
-        # self.writer.add_scalar("Indexes/Mean Dice", self.meanDice, epoch, new_style=True)
         self.writer.add_scalar("Indexes/Tversky", self.tversky, epoch, new_style=True)
         if lr is not None:
             self.writer.add_scalar("Learning Rate", lr, epoch, new_style=True)
@@ -92,13 +76,14 @@ class Metrics(nn.Module):
 
 class EvaluationMetrics(Metrics):
     """docstring for EvaluationMetrics"""
-    def __init__(self, buffer_size, model_name: str, loss_name: str, opt_name: str, epochs: int, batch_size: int, learning_rate: float, negative_mining: bool, soft_labels: bool, smooth=1e-7, device=None):
+    def __init__(self, buffer_size, model_name: str, loss_name: str, opt_name: str, pip_name: str, epochs: int, batch_size: int, learning_rate: float, negative_mining: bool, soft_labels: bool, smooth=1e-7, device=None):
         super(EvaluationMetrics, self).__init__(
             buffer_size,
             mode="Evaluation",
             model_name=model_name,
             loss_name=loss_name,
             opt_name=opt_name,
+            pip_name=pip_name,
             batch_size=batch_size,
             learning_rate=learning_rate,
             negative_mining=negative_mining,
