@@ -54,7 +54,7 @@ class PixelLoss(nn.Module):
     def __init__(self, pixel_loss, volume_loss, ratio=None):
         super(PixelLoss, self).__init__()
         self.pixel_loss = pixel_loss
-        self.__class__.__name__ = self.pixel_loss.__class__.__.name__
+        self.__class__.__name__ = self.pixel_loss.__class__.__name__
 
     def __repr__(self):
         return self.__class__.__name__
@@ -66,7 +66,7 @@ class VolumeLoss(nn.Module):
     def __init__(self, pixel_loss, volume_loss, ratio=None):
         super(VolumeLoss, self).__init__()
         self.volume_loss = volume_loss
-        self.__class__.__name__ = self.volume_loss.__class__.__.name__
+        self.__class__.__name__ = self.volume_loss.__class__.__name__
 
     def __repr__(self):
         return self.__class__.__name__
