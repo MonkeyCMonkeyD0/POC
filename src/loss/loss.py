@@ -31,11 +31,6 @@ class BorderedLoss(nn.Module):
     def __repr__(self):
         return self.__class__.__name__
 
-    # def to(self, device: str):
-    #     super(BorderedLoss, self).to(device)
-    #     self.kernel = self.kernel.to(device)
-    #     return self
-
     def create_border_mask(self, masks: torch.Tensor):
         borders = F.conv2d(masks[:,-1:], weight=self.kernel, padding='same')
         borders.clamp_(min=0., max=1.)
@@ -53,3 +48,29 @@ class BorderedLoss(nn.Module):
         border_loss_val = (1 - self.ratio) * self.border_loss(emphasized_preds, emphasized_targets)
 
         return volume_loss_val + border_loss_val
+
+
+class OnlyPixelLoss(nn.Module):
+    def __init__(self, pixel_loss, volume_loss, ratio=None):
+        super(BorderedLoss, self).__init__()
+        self.pixel_loss = pixel_loss
+        self.__class__.__name__ = self.pixel_loss.__class__.__.name__
+
+    def __repr__(self):
+        return self.__class__.__name__
+
+    def forward(self, preds: torch.Tensor, targets: torch.Tensor):
+        return self.pixel_loss(preds, targets)
+
+class OnlyVolumeLoss(nn.Module):
+    def __init__(self, pixel_loss, volume_loss, ratio=None):
+        super(BorderedLoss, self).__init__()
+        self.volume_loss = volume_loss
+        self.__class__.__name__ = self.volume_loss.__class__.__.name__
+
+    def __repr__(self):
+        return self.__class__.__name__
+
+    def forward(self, preds: torch.Tensor, targets: torch.Tensor):
+        return self.volume_loss(preds, targets)
+
