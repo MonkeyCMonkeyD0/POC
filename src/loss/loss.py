@@ -50,9 +50,9 @@ class BorderedLoss(nn.Module):
         return volume_loss_val + border_loss_val
 
 
-class OnlyPixelLoss(nn.Module):
+class PixelLoss(nn.Module):
     def __init__(self, pixel_loss, volume_loss, ratio=None):
-        super(BorderedLoss, self).__init__()
+        super(PixelLoss, self).__init__()
         self.pixel_loss = pixel_loss
         self.__class__.__name__ = self.pixel_loss.__class__.__.name__
 
@@ -62,9 +62,9 @@ class OnlyPixelLoss(nn.Module):
     def forward(self, preds: torch.Tensor, targets: torch.Tensor):
         return self.pixel_loss(preds, targets)
 
-class OnlyVolumeLoss(nn.Module):
+class VolumeLoss(nn.Module):
     def __init__(self, pixel_loss, volume_loss, ratio=None):
-        super(BorderedLoss, self).__init__()
+        super(VolumeLoss, self).__init__()
         self.volume_loss = volume_loss
         self.__class__.__name__ = self.volume_loss.__class__.__.name__
 
