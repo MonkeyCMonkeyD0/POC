@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+from torchvision.transforms import Compose
 
 
 class InputPipeline(nn.Module):
@@ -7,16 +8,23 @@ class InputPipeline(nn.Module):
         super().__init__()
         if isinstance(transformer, list):
             self.transformer = transformer
-        else:
+        elif isinstance(transformer, nn.Module):
             self.transformer = [transformer]
+        else:
+            self.transformer = None
 
-        self.layer_transformer = nn.ModuleList(layer_transformer)
+        if isinstance(layer_transformer, list):
+            self.layer_transformer = nn.ModuleList(layer_transformer)
+        elif isinstance(layer_transformer, nn.Module):
+            self.layer_transformer = nn.ModuleList([layer_transformer])
+        else:
+            self.layer_transformer = None
+
 
     def forward(self, img):
         n_channel = img.size()[-3]
         if self.transformer is not None:
-            for transform in self.transformer:
-                img = transform(img)
+            img = Compose(self.transformer)(img)
         if self.layer_transformer is not None:
             for transform in self.layer_transformer:
                 new_channel = transform(img[0:n_channel])
@@ -26,5 +34,5 @@ class InputPipeline(nn.Module):
     def __repr__(self) -> str:
         return "{}({}+{})".format(
             self.__class__.__name__,
-            self.transformer.__class__.__name__ if self.transformer is not None else " ",
-            self.layer_transformer.__class__.__name__ if self.layer_transformer is not None else " ")
+            ",".join([t.__name__ for t in self.transformer]) if self.transformer is not None else " ",
+            ",".join([str(t) for t in self.layer_transformer]) if self.layer_transformer is not None else " ")
