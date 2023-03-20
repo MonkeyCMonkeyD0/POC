@@ -1,6 +1,6 @@
 import torch
 
-from utils import get_gpu_mem_usage
+from my_utils import get_gpu_mem_usage
 
 
 

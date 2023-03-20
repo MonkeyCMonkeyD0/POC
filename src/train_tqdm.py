@@ -1,7 +1,7 @@
 import torch
 from tqdm.notebook import tqdm
 
-from utils import get_gpu_mem_usage
+from my_utils import get_gpu_mem_usage
 
 
 

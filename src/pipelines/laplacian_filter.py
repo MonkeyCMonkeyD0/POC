@@ -24,7 +24,7 @@ class LaplacianFilter(nn.Module):
         img = self.pad(img)
 
         img = threshold(img, threshold=img.quantile(.98), value=0)
-        return img
+        return img.detach()
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}"

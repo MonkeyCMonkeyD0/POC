@@ -24,13 +24,15 @@ class InputPipeline(nn.Module):
 
 
     def forward(self, img):
-        n_channel = img.size()[-3]
-        if self.transformer is not None:
-            img = Compose(self.transformer)(img)
+        img = img.detach()
+        n_channel = img.shape[-3]
         if self.layer_transformer is not None:
             for transform in self.layer_transformer:
                 new_channel = transform(img[0:n_channel])
+                new_channel = (new_channel - new_channel.min()) / new_channel.max()
                 img = torch.cat((img, new_channel), dim=-3) 
+        if self.transformer is not None:
+            img[0:n_channel] = Compose(self.transformer)(img[0:n_channel])
         return img
 
     @property    
