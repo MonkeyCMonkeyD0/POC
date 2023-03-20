@@ -11,11 +11,11 @@ from .tversky import TverskyIndex
 
 
 class Metrics(nn.Module):
-    def __init__(self, buffer_size, mode: str, model_name: str, loss_name: str, opt_name: str, pip_name: str, batch_size: int, learning_rate: float, negative_mining: bool, soft_labels: bool, smooth=1e-7, device=None):
+    def __init__(self, buffer_size, mode: str, hyperparam: dict, smooth=1e-7, device=None):
         super(Metrics, self).__init__()
 
         self.device = device
-        self.hyperparameters = {"Model": model_name, "Loss function": loss_name, "Optimizer": opt_name, "Learning rate": learning_rate, "Batch size": batch_size, "Smooth Labeling": soft_labels, "Negative Mining": negative_mining, "Input Pipeline": pip_name}
+        self.hyperparameters = hyperparam
         self.register_buffer("_losses", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
         self.register_buffer("_scores_crack_IOU", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
         self.register_buffer("_scores_mean_IOU", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
@@ -26,8 +26,10 @@ class Metrics(nn.Module):
         self.tverskyIndex = TverskyIndex(alpha=.3, beta=.7, smooth=smooth).to(self.device)
 
         assert mode in ["Training", "Validation", "Evaluation"]
-        flags = "" + ("-NM" if negative_mining else "") + ("-SL" if soft_labels else "")
-        self.log_folder = f"../logs/{model_name}-{loss_name}-{opt_name}-{pip_name}-BS:{batch_size}-LR:{learning_rate:.1e}{flags}/{mode}"
+        flags = "" + ("-NM" if self.hyperparameters["Negative Mining"] else "") + ("-SL" if self.hyperparameters["Smooth Labeling"] else "")
+        self.log_folder = f"../logs/N:{self.hyperparameters["Network"]}-L:{self.hyperparameters["Combine Loss"]}-{self.hyperparameters["Pixel Loss"]}-{self.hyperparameters["Volume Loss"]}"
+        self.log_folder += f"-O:{self.hyperparameters["Optimizer"]}-P:{self.hyperparameters["Input Filter"]}-{self.hyperparameters["Input Layer"]}"
+        self.log_folder += f"-BS:{self.hyperparameters["Batch Size"]}-LR:{self.hyperparameters["Learning Rate"]:.1e}{flags}/{mode}"
         self.writer = SummaryWriter(self.log_folder, max_queue=4)
 
 
@@ -76,21 +78,8 @@ class Metrics(nn.Module):
 
 class EvaluationMetrics(Metrics):
     """docstring for EvaluationMetrics"""
-    def __init__(self, buffer_size, model_name: str, loss_name: str, opt_name: str, pip_name: str, epochs: int, batch_size: int, learning_rate: float, negative_mining: bool, soft_labels: bool, smooth=1e-7, device=None):
-        super(EvaluationMetrics, self).__init__(
-            buffer_size,
-            mode="Evaluation",
-            model_name=model_name,
-            loss_name=loss_name,
-            opt_name=opt_name,
-            pip_name=pip_name,
-            batch_size=batch_size,
-            learning_rate=learning_rate,
-            negative_mining=negative_mining,
-            soft_labels=soft_labels,
-            smooth=smooth,
-            device=device
-        )
+    def __init__(self, buffer_size, hyperparam: dict, smooth=1e-7, device=None):
+        super(EvaluationMetrics, self).__init__(buffer_size, mode="Evaluation", hyperparam=hyperparam, smooth=smooth, device=device)
 
         self.name_list = []
         self.dataframe = pd.DataFrame(columns=["Image", "CrackIoU", "MeanIoU"])
@@ -105,8 +94,8 @@ class EvaluationMetrics(Metrics):
         self.writer.add_hparams(
             hparam_dict=self.hyperparameters, 
             metric_dict={
-                "Crack IOU": self.crackIoU, "Mean IOU": self.meanIoU,
-                # "Crack Dice": self.crackDice, "Mean Dice": self.meanDice,
+                "Crack IOU": self.crackIoU, 
+                "Mean IOU": self.meanIoU,
                 "Tversky": self.tversky},
             run_name=".")
 
