@@ -10,7 +10,7 @@ from torchvision.io import read_image, ImageReadMode
 from torch.utils.data import Dataset, WeightedRandomSampler, default_collate
 from torchvision import transforms
 
-from utils import get_gpu_mem_usage, get_ram_usage
+from my_utils import get_gpu_mem_usage, get_ram_usage
 
 
 
@@ -110,7 +110,7 @@ class POCDataset(Dataset):
     def __getitem__(self, idx):
         img, mask, original_file = self.data[idx]
         img = img.float() / 255                         # convert [0;255] int8 to [0;1] float32
-        mask = mask.float()                             # convert to float for gaussian filter
+        mask = mask.float() / 255                       # convert to float for gaussian filter
 
         if self.transform:
             img = self.transform(img)
@@ -125,10 +125,29 @@ class POCDataset(Dataset):
         if self.sampler is not None:
             self.sampler.weights.index_fill_(0, idx, weight)
 
+    def precompute_transform(self, load_on_gpu: bool):
+        for key, (img, mask, file_name) in tqdm(self.data.items(), desc="Applying transform to the Dataset"):
+            img = img.float() / 255         # Convert both to float for opperations
+            mask = mask.float() / 255
+
+            if self.transform:
+                img = self.transform(img)
+            if self.target_transform:
+                mask = self.target_transform(mask)
+
+            img = (img * 255).clamp(0, 255).byte()     # Convert both back to uint8 for storage
+            mask = (mask * 255).clamp(0, 255).byte()
+            self.data[key] = (img, mask, file_name)
+
+        self.transform = None
+        self.target_transform = None
+
+        print("\t- Transformation done, {}".format(get_gpu_mem_usage() if load_on_gpu else get_ram_usage()))
+
 
 class POCDataReader(object):
     """docstring for POCDataLoader"""
-    def __init__(self, root_dir, load_on_gpu=True):
+    def __init__(self, root_dir, load_on_gpu: bool = True, limit: int = None):
         super(POCDataReader, self).__init__()
         """
         Args:
@@ -145,6 +164,10 @@ class POCDataReader(object):
 
         self.data = {}
         for i, (img_path, mask_path) in tenumerate(self._files, desc=f"Loading dataset into {'GPU' if self.load_on_gpu else 'RAM'}", tqdm_class=tqdm):
+
+            if limit is not None and i >= limit:
+                break
+
             img = read_image(img_path, mode=ImageReadMode.UNCHANGED)
             mask = read_image(mask_path, mode=ImageReadMode.GRAY).bool()
             file_name = os.path.basename(img_path)
