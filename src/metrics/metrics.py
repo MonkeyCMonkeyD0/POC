@@ -26,10 +26,10 @@ class Metrics(nn.Module):
         self.tverskyIndex = TverskyIndex(alpha=.3, beta=.7, smooth=smooth).to(self.device)
 
         assert mode in ["Training", "Validation", "Evaluation"]
-        flags = "" + ("-NM" if self.hyperparameters["Negative Mining"] else "") + ("-SL" if self.hyperparameters["Smooth Labeling"] else "")
-        self.log_folder = f"../logs/N:{self.hyperparameters["Network"]}-L:{self.hyperparameters["Combine Loss"]}-{self.hyperparameters["Pixel Loss"]}-{self.hyperparameters["Volume Loss"]}"
-        self.log_folder += f"-O:{self.hyperparameters["Optimizer"]}-P:{self.hyperparameters["Input Filter"]}-{self.hyperparameters["Input Layer"]}"
-        self.log_folder += f"-BS:{self.hyperparameters["Batch Size"]}-LR:{self.hyperparameters["Learning Rate"]:.1e}{flags}/{mode}"
+        flags = "" + ("-NM" if self.hyperparameters['Negative Mining'] else "") + ("-SL" if self.hyperparameters['Smooth Labeling'] else "")
+        self.log_folder = f"../logs/N:{self.hyperparameters['Network']}-L:{self.hyperparameters['Combine Loss']}-{self.hyperparameters['Pixel Loss']}-{self.hyperparameters['Volume Loss']}"
+        self.log_folder += f"-O:{self.hyperparameters['Optimizer']}-P:{self.hyperparameters['Input Filter']}-{self.hyperparameters['Input Layer']}"
+        self.log_folder += f"-BS:{self.hyperparameters['Batch Size']}-LR:{self.hyperparameters['Learning Rate']:.1e}{flags}/{mode}"
         self.writer = SummaryWriter(self.log_folder, max_queue=4)
 
 
