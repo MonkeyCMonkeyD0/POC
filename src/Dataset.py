@@ -95,12 +95,19 @@ def data_augment_(data, n: int, load_on_gpu=False):
 
 class POCDataset(Dataset):
     """docstring for POCDataset"""
-    def __init__(self, data, transform=None, target_transform=None, negative_mining=True):
+    def __init__(self, data, transform=None, target_transform=None, negative_mining: bool = True, load_on_gpu: bool = False):
         super(POCDataset, self).__init__()
         self.sampler = None
-        self.data = data
+        self.load_on_gpu = torch.cuda.is_available() and load_on_gpu
         self.transform = transform
         self.target_transform = target_transform
+
+        if self.load_on_gpu:
+            self.data = {k: (img.clone().cuda(), mask.clone().cuda(), file) for k, (img, mask, file) in data.items()}
+        else:
+            self.data = {k: (img.clone(), mask.clone(), file) for k, (img, mask, file) in data.items()}
+        print("\t- Loading done, {}".format(get_gpu_mem_usage() if self.load_on_gpu else get_ram_usage()))
+
         if negative_mining:
             self.sampler = WeightedRandomSampler(torch.ones(self.__len__()), num_samples=self.__len__(), replacement=True)
 
@@ -125,7 +132,7 @@ class POCDataset(Dataset):
         if self.sampler is not None:
             self.sampler.weights.index_fill_(0, idx, weight)
 
-    def precompute_transform(self, load_on_gpu: bool):
+    def precompute_transform(self):
         for key, (img, mask, file_name) in tqdm(self.data.items(), desc="Applying transform to the Dataset"):
             img = img.float() / 255         # Convert both to float for opperations
             mask = mask.float() / 255
@@ -142,18 +149,17 @@ class POCDataset(Dataset):
         self.transform = None
         self.target_transform = None
 
-        print("\t- Transformation done, {}".format(get_gpu_mem_usage() if load_on_gpu else get_ram_usage()))
+        print("\t- Transformation done, {}".format(get_gpu_mem_usage() if self.load_on_gpu else get_ram_usage()))
 
 
 class POCDataReader(object):
     """docstring for POCDataLoader"""
-    def __init__(self, root_dir, load_on_gpu: bool = True, limit: int = None):
+    def __init__(self, root_dir, load_on_gpu: bool = False, limit: int = None):
         super(POCDataReader, self).__init__()
         """
         Args:
             root_dir (string): Directory with all the images.
-            transform (callable, optional): Optional transform to be applied
-                on a sample.
+            load_on_gpu (bool): Should data tensor be on cuda device.
         """
         self.root_dir = root_dir
         self.load_on_gpu = torch.cuda.is_available() and load_on_gpu
@@ -169,7 +175,7 @@ class POCDataReader(object):
                 break
 
             img = read_image(img_path, mode=ImageReadMode.UNCHANGED)
-            mask = read_image(mask_path, mode=ImageReadMode.GRAY).bool()
+            mask = read_image(mask_path, mode=ImageReadMode.GRAY)
             file_name = os.path.basename(img_path)
             if self.load_on_gpu:
                 self.data[i] = (img.cuda(), mask.cuda(), file_name)
