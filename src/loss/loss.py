@@ -15,6 +15,9 @@ class CombinedLoss(nn.Module):
     def __repr__(self):
         return self.__class__.__name__
 
+    def __str__(self):
+        return "CombinedLoss"
+
     def forward(self, *args):
         return self.ratio * self.loss1(*args) + (1 - self.ratio) * self.loss2(*args)
 
@@ -30,6 +33,9 @@ class BorderedLoss(nn.Module):
 
     def __repr__(self):
         return self.__class__.__name__
+
+    def __str__(self):
+        return "BorderedLoss"
 
     def create_border_mask(self, masks: torch.Tensor):
         borders = F.conv2d(masks[:,-1:], weight=self.kernel, padding='same')
@@ -59,6 +65,9 @@ class PixelLoss(nn.Module):
     def __repr__(self):
         return self.__class__.__name__
 
+    def __str__(self):
+        return "PixelLoss"
+
     def forward(self, preds: torch.Tensor, targets: torch.Tensor):
         return self.pixel_loss(preds, targets)
 
@@ -70,6 +79,9 @@ class VolumeLoss(nn.Module):
 
     def __repr__(self):
         return self.__class__.__name__
+
+    def __str__(self):
+        return "VolumeLoss"
 
     def forward(self, preds: torch.Tensor, targets: torch.Tensor):
         return self.volume_loss(preds, targets)
