@@ -24,7 +24,6 @@ class InputPipeline(nn.Module):
 
 
     def forward(self, img):
-        img = img.detach()
         n_channel = img.shape[-3]
         if self.layer_transformer is not None:
             for transform in self.layer_transformer:
