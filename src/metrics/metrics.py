@@ -26,18 +26,15 @@ class Metrics(nn.Module):
         self.tverskyIndex = TverskyIndex(alpha=.3, beta=.7, smooth=smooth).to(self.device)
 
         assert mode in ["Training", "Validation", "Evaluation"]
-        # flags = "" + ("-NM" if self.hyperparameters['Negative Mining'] == 'True' else "") + ("-SL" if self.hyperparameters['Smooth Labeling'] == 'True' else "")
-        # self.log_folder = f"../logs/N:{self.hyperparameters['Network']}-L:{self.hyperparameters['Combine Loss']}-{self.hyperparameters['Pixel Loss']}-{self.hyperparameters['Volume Loss']}"
-        # self.log_folder += f"-O:{self.hyperparameters['Optimizer']}-P:{self.hyperparameters['Input Filter']}-{self.hyperparameters['Input Layer']}"
-        # self.log_folder += f"-BS:{self.hyperparameters['Batch Size']}-LR:{float(self.hyperparameters['Learning Rate']):.1e}{flags}/{mode}"
 
         self.hyperparameters = hyperparam
         self.hyperparameters['Network'] = self.hyperparameters['Network'].__class__.__name__
         self.hyperparameters['Combine Loss'] = self.hyperparameters['Combine Loss'].__class__.__name__
         self.hyperparameters['Optimizer'] = self.hyperparameters['Optimizer'].__class__.__name__
-        self.hyperparameters['Input Filter'] = self.hyperparameters['Input Filter'].__name__
+        self.hyperparameters['Input Filter'] = self.hyperparameters['Input Filter'].__name__ if self.hyperparameters['Input Filter'] is not None else " "
 
         flags = "" + ("-NM" if self.hyperparameters['Negative Mining'] else "") + ("-SL" if self.hyperparameters['Smooth Labeling'] else "")
+
         self.log_folder = f"../logs/N:{self.hyperparameters['Network']}-O:{self.hyperparameters['Optimizer']}"
         self.log_folder += f"-L:{self.hyperparameters['Combine Loss']}_{self.hyperparameters['Pixel Loss']}_{self.hyperparameters['Volume Loss']}"
         self.log_folder += f"-P:{self.hyperparameters['Input Filter']}_{self.hyperparameters['Input Layer']}"
