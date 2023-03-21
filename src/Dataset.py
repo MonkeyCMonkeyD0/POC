@@ -31,13 +31,14 @@ def _get_dataset_files(root_dir: str):
     return items
 
 
-def data_augment_(data, n: int, load_on_gpu=False):
+def data_augment_(data, n: int, load_on_gpu: bool = False, verbose: bool = False):
     if n <= 0:
         warnings.warn("Need a strictly positive integer for n for data augmentation. Will skip augmentation.")
         return None
 
     original_dataset_lenght = len(data)
-    for idx in trange(original_dataset_lenght, desc="Expending the dataset {} more times".format(n)):
+    loop = trange(original_dataset_lenght, desc="Expending the dataset {} more times".format(n)) if verbose else range(original_dataset_lenght)
+    for idx in loop:
         img, mask, original_file = data[idx]
         for i_n in range(n):
             new_img = img.detach().clone()
@@ -89,13 +90,14 @@ def data_augment_(data, n: int, load_on_gpu=False):
 
             data[original_dataset_lenght + idx * n + i_n] = (new_img, new_mask, original_file)
 
-    print("\t- Augmentation done, {}".format(get_gpu_mem_usage() if load_on_gpu else get_ram_usage()))
-    print("\t- Got {} new images and a total of {} images.".format(len(data) - original_dataset_lenght, len(data)))
+    if verbose:
+        print("\t- Augmentation done, {}".format(get_gpu_mem_usage() if load_on_gpu else get_ram_usage()))
+        print("\t- Got {} new images and a total of {} images.".format(len(data) - original_dataset_lenght, len(data)))
 
 
 class POCDataset(Dataset):
     """docstring for POCDataset"""
-    def __init__(self, data, transform=None, target_transform=None, negative_mining: bool = True, load_on_gpu: bool = False):
+    def __init__(self, data, transform=None, target_transform=None, negative_mining: bool = True, load_on_gpu: bool = False, verbose: bool = False):
         super(POCDataset, self).__init__()
         self.sampler = None
         self.load_on_gpu = torch.cuda.is_available() and load_on_gpu
@@ -106,7 +108,8 @@ class POCDataset(Dataset):
             self.data = {k: (img.clone().cuda(), mask.clone().cuda(), file) for k, (img, mask, file) in data.items()}
         else:
             self.data = {k: (img.clone(), mask.clone(), file) for k, (img, mask, file) in data.items()}
-        print("\t- Loading done, {}".format(get_gpu_mem_usage() if self.load_on_gpu else get_ram_usage()))
+        if verbose:
+            print("\t- Loading done, {}".format(get_gpu_mem_usage() if self.load_on_gpu else get_ram_usage()))
 
         if negative_mining:
             self.sampler = WeightedRandomSampler(torch.ones(self.__len__()), num_samples=self.__len__(), replacement=True)
@@ -132,8 +135,9 @@ class POCDataset(Dataset):
         if self.sampler is not None:
             self.sampler.weights.index_fill_(0, idx, weight)
 
-    def precompute_transform(self):
-        for key, (img, mask, file_name) in tqdm(self.data.items(), desc="Applying transform to the Dataset"):
+    def precompute_transform(self, verbose: bool = False):
+        item_loop = tqdm(self.data.items(), desc="Applying transform to the Dataset") if verbose else self.data.items()
+        for key, (img, mask, file_name) in item_loop:
             img = img.float() / 255         # Convert both to float for opperations
             mask = mask.float() / 255
 
@@ -149,12 +153,13 @@ class POCDataset(Dataset):
         self.transform = None
         self.target_transform = None
 
-        print("\t- Transformation done, {}".format(get_gpu_mem_usage() if self.load_on_gpu else get_ram_usage()))
+        if verbose:
+            print("\t- Transformation done, {}".format(get_gpu_mem_usage() if self.load_on_gpu else get_ram_usage()))
 
 
 class POCDataReader(object):
     """docstring for POCDataLoader"""
-    def __init__(self, root_dir, load_on_gpu: bool = False, limit: int = None):
+    def __init__(self, root_dir, load_on_gpu: bool = False, limit: int = None, verbose: bool = False):
         super(POCDataReader, self).__init__()
         """
         Args:
@@ -169,8 +174,8 @@ class POCDataReader(object):
             print("Cannot load Dataset on GPU, cuda is not available.")
 
         self.data = {}
-        for i, (img_path, mask_path) in tenumerate(self._files, desc=f"Loading dataset into {'GPU' if self.load_on_gpu else 'RAM'}", tqdm_class=tqdm):
-
+        loop_enum = tenumerate(self._files, desc=f"Loading dataset into {'GPU' if self.load_on_gpu else 'RAM'}", tqdm_class=tqdm) if verbose else enumerate(self._files)
+        for i, (img_path, mask_path) in loop_enum:
             if limit is not None and i >= limit:
                 break
 
@@ -182,8 +187,9 @@ class POCDataReader(object):
             else:
                 self.data[i] = (img, mask, file_name)
 
-        print("\t- Loading done, {}".format(get_gpu_mem_usage() if self.load_on_gpu else get_ram_usage()))
-        print("\t- Got a total of {} images.".format(self.__len__()))
+        if verbose:
+            print("\t- Loading done, {}".format(get_gpu_mem_usage() if self.load_on_gpu else get_ram_usage()))
+            print("\t- Got a total of {} images.".format(self.__len__()))
 
     def __len__(self):
         return len(self.data)
