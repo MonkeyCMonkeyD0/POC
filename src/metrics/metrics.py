@@ -28,9 +28,9 @@ class Metrics(nn.Module):
         assert mode in ["Training", "Validation", "Evaluation"]
 
         self.hyperparameters = {k: v for k,v in hyperparam.items()}
-        self.hyperparameters['Network'] = self.hyperparameters['Network'].__class__.__name__
-        self.hyperparameters['Combine Loss'] = self.hyperparameters['Combine Loss'].__class__.__name__
-        self.hyperparameters['Optimizer'] = self.hyperparameters['Optimizer'].__class__.__name__
+        self.hyperparameters['Network'] = self.hyperparameters['Network'].__name__
+        self.hyperparameters['Combine Loss'] = self.hyperparameters['Combine Loss'].__name__
+        self.hyperparameters['Optimizer'] = self.hyperparameters['Optimizer'].__name__
         self.hyperparameters['Input Filter'] = self.hyperparameters['Input Filter'].__name__ if self.hyperparameters['Input Filter'] is not None else " "
 
         flags = "" + ("-NM" if self.hyperparameters['Negative Mining'] else "") + ("-SL" if self.hyperparameters['Smooth Labeling'] else "")
