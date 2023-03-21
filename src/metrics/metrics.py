@@ -27,7 +27,7 @@ class Metrics(nn.Module):
 
         assert mode in ["Training", "Validation", "Evaluation"]
 
-        self.hyperparameters = hyperparam
+        self.hyperparameters = {k: v for k,v in hyperparam.items()}
         self.hyperparameters['Network'] = self.hyperparameters['Network'].__class__.__name__
         self.hyperparameters['Combine Loss'] = self.hyperparameters['Combine Loss'].__class__.__name__
         self.hyperparameters['Optimizer'] = self.hyperparameters['Optimizer'].__class__.__name__
