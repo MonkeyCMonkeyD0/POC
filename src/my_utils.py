@@ -6,7 +6,10 @@ from torch.nn.functional import softmax, normalize
 
 
 def show_img(tensors):
-    fix, axs = plt.subplots(ncols=len(tensors), nrows=max(tensors.size()[-3] - 2, 1), squeeze=False)
+    ncols = len(tensors)
+    nrows = max(tensors.size()[-3] - 2, 1)
+    fig, axs = plt.subplots(ncols=ncols, nrows=nrows, squeeze=False, figsize=(8 * ncols, 6 * nrows))
+    fig.tight_layout()
     for i, tensor in enumerate(tensors):
         tensor = tensor.detach().cpu()
 
