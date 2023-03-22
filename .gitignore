@@ -1,6 +1,8 @@
 ### CUSTOM RULES ###
 logs
 logs (copy)
+ray_results
+best_model
 ### ~~~~~~~~~~~~ ###
 
 # Byte-compiled / optimized / DLL files
