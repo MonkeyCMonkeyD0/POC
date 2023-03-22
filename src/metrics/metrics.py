@@ -29,8 +29,11 @@ class Metrics(nn.Module):
         self.hyperparameters = {k: v for k,v in hyperparam.items()}
         self.hyperparameters['Network'] = self.hyperparameters['Network'].__name__
         self.hyperparameters['Combine Loss'] = self.hyperparameters['Combine Loss'].__name__
+        self.hyperparameters['Pixel Loss'] = str(self.hyperparameters['Pixel Loss'])
+        self.hyperparameters['Volume Loss'] = str(self.hyperparameters['Volume Loss'])
         self.hyperparameters['Optimizer'] = self.hyperparameters['Optimizer'].__name__
         self.hyperparameters['Input Filter'] = self.hyperparameters['Input Filter'].__name__ if self.hyperparameters['Input Filter'] is not None else "None"
+        self.hyperparameters['Input Layer'] = str(self.hyperparameters['Input Layer'])
 
         flags = "" + ("-NM" if self.hyperparameters['Negative Mining'] else "") + ("-SL" if self.hyperparameters['Smooth Labeling'] else "")
 
@@ -97,9 +100,6 @@ class EvaluationMetrics(Metrics):
         self.name_list = []
         self.dataframe = pd.DataFrame(columns=["Image", "CrackIoU", "MeanIoU"])
         self.hyperparameters["Epochs"] = epochs
-        for k in self.hyperparameters:
-            print(k, type(self.hyperparameters[k]))
-
 
     def collect_metrics(self, item_index: int, img_name: str, preds: torch.Tensor, targets: torch.Tensor):
         super().collect_metrics(item_index, 0., preds, targets)
