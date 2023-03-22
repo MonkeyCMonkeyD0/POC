@@ -15,7 +15,6 @@ class Metrics(nn.Module):
         super(Metrics, self).__init__()
 
         self.device = device
-        # self.hyperparameters = {k: str(v) for k, v in hyperparam.items()}
         self.register_buffer("_losses", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
         self.register_buffer("_scores_crack_IOU", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
         self.register_buffer("_scores_mean_IOU", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
@@ -31,7 +30,7 @@ class Metrics(nn.Module):
         self.hyperparameters['Network'] = self.hyperparameters['Network'].__name__
         self.hyperparameters['Combine Loss'] = self.hyperparameters['Combine Loss'].__name__
         self.hyperparameters['Optimizer'] = self.hyperparameters['Optimizer'].__name__
-        self.hyperparameters['Input Filter'] = self.hyperparameters['Input Filter'].__name__ if self.hyperparameters['Input Filter'] is not None else " "
+        self.hyperparameters['Input Filter'] = self.hyperparameters['Input Filter'].__name__ if self.hyperparameters['Input Filter'] is not None else "None"
 
         flags = "" + ("-NM" if self.hyperparameters['Negative Mining'] else "") + ("-SL" if self.hyperparameters['Smooth Labeling'] else "")
 
@@ -92,7 +91,7 @@ class Metrics(nn.Module):
 
 class EvaluationMetrics(Metrics):
     """docstring for EvaluationMetrics"""
-    def __init__(self, buffer_size, hyperparam: dict, smooth=1e-7, device=None):
+    def __init__(self, buffer_size, hyperparam: dict, epochs: int, smooth=1e-7, device=None):
         super(EvaluationMetrics, self).__init__(buffer_size, mode="Evaluation", hyperparam=hyperparam, smooth=smooth, device=device)
 
         self.name_list = []
