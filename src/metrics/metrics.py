@@ -97,6 +97,8 @@ class EvaluationMetrics(Metrics):
         self.name_list = []
         self.dataframe = pd.DataFrame(columns=["Image", "CrackIoU", "MeanIoU"])
         self.hyperparameters["Epochs"] = epochs
+        for k in self.hyperparameters:
+            print(k, type(self.hyperparameters[k]))
 
 
     def collect_metrics(self, item_index: int, img_name: str, preds: torch.Tensor, targets: torch.Tensor):
@@ -105,7 +107,7 @@ class EvaluationMetrics(Metrics):
 
     def write_hyperparameters_tensorboard(self):
         self.writer.add_hparams(
-            hparam_dict=self.hyperparameters, 
+            hparam_dict=self.hyperparameters,
             metric_dict={
                 "Crack IOU": self.crackIoU, 
                 "Mean IOU": self.meanIoU,
