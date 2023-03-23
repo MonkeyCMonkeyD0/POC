@@ -1,6 +1,5 @@
 ### CUSTOM RULES ###
-logs
-logs (copy)
+logs*
 ray_results
 best_model
 ### ~~~~~~~~~~~~ ###
