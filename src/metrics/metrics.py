@@ -27,13 +27,22 @@ class Metrics(nn.Module):
         assert mode in ["Training", "Validation", "Evaluation"]
 
         self.hyperparameters = {k: v for k,v in hyperparam.items()}
-        self.hyperparameters['Network'] = self.hyperparameters['Network'].__name__
-        self.hyperparameters['Combine Loss'] = self.hyperparameters['Combine Loss'].__name__
+
+        if not isinstance(self.hyperparameters['Network'], str):
+            self.hyperparameters['Network'] = self.hyperparameters['Network'].__name__
+        if not isinstance(self.hyperparameters['Optimizer'], str):
+            self.hyperparameters['Optimizer'] = self.hyperparameters['Optimizer'].__name__
+        if not isinstance(self.hyperparameters['Combine Loss'], str):
+            self.hyperparameters['Combine Loss'] = self.hyperparameters['Combine Loss'].__name__  
+
         self.hyperparameters['Pixel Loss'] = str(self.hyperparameters['Pixel Loss'])
         self.hyperparameters['Volume Loss'] = str(self.hyperparameters['Volume Loss'])
-        self.hyperparameters['Optimizer'] = self.hyperparameters['Optimizer'].__name__
-        self.hyperparameters['Input Filter'] = self.hyperparameters['Input Filter'].__name__ if self.hyperparameters['Input Filter'] is not None else "None"
         self.hyperparameters['Input Layer'] = str(self.hyperparameters['Input Layer'])
+
+        if self.hyperparameters['Input Filter'] is None:
+            self.hyperparameters['Input Filter'] = "None"
+        elif not isinstance(self.hyperparameters['Input Filter'], str):
+            self.hyperparameters['Input Filter'] = self.hyperparameters['Input Filter'].__name__
 
         flags = "" + ("-NM" if self.hyperparameters['Negative Mining'] else "") + ("-SL" if self.hyperparameters['Smooth Labeling'] else "")
 
@@ -133,7 +142,7 @@ class EvaluationMetrics(Metrics):
         images = []; masks = []; files = []
         for i in range(8):
             image, mask, file, _ = next(iter(dataloader))
-            images.append(image); masks.append(mask[:,1:]); files.append(file)
+            images.append(image); masks.append(mask[:,-1:]); files.append(file)
         images = torch.cat(images, dim=0).to(self.device)
         masks = torch.cat(masks, dim=0)
 
@@ -145,7 +154,7 @@ class EvaluationMetrics(Metrics):
             masks = (255 * masks).byte()
             preds = (255 * preds.argmax(dim=1, keepdim=True)).byte()
 
-        img_tensor = torch.cat((images.cpu(), preds.cpu(),masks), dim=0)
+        img_tensor = torch.cat((images[:, 0:3].cpu(), preds.expand(-1, 3, -1, -1).cpu(), masks.expand(-1, 3, -1, -1).cpu()), dim=0)
         self.writer.add_images(f"Segmentation example ({files})", img_tensor, dataformats='NCHW')
 
         # def write_model_graph_tensorboard(self, model: nn.Module, images):

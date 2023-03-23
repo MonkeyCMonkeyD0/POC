@@ -17,6 +17,7 @@ class LaplacianFilter(nn.Module):
         self.laplacian_filter.weight = nn.Parameter(kernel.expand(1, 3, -1, -1), requires_grad=False)
         self.pad = Pad(padding=1, padding_mode='edge')
 
+    @torch.no_grad()
     def forward(self, img):
         if self.smooth:
             img = self.gaussian_blur(img)

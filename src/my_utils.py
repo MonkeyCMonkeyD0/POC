@@ -7,8 +7,8 @@ from torch.nn.functional import softmax, normalize
 
 def show_img(tensors):
     ncols = len(tensors)
-    nrows = max(tensors.size()[-3] - 2, 1)
-    fig, axs = plt.subplots(ncols=ncols, nrows=nrows, squeeze=False, figsize=(8 * ncols, 6 * nrows))
+    nrows = max(tensors.size(-3) - 2, 1)
+    fig, axs = plt.subplots(ncols=ncols, nrows=nrows, squeeze=False, figsize=(tensors.size(-1) * ncols / 100, tensors.size(-2) * nrows / 100))
     fig.tight_layout()
     for i, tensor in enumerate(tensors):
         tensor = tensor.detach().cpu()
@@ -16,9 +16,11 @@ def show_img(tensors):
         img = tensor[0:3]
         filters = tensor[3:]
 
-        if img.size()[0] < 3:
-            img = img[-1]
-            array = np.array(255 * img / img.max(), dtype=np.uint8)
+        if img.size(0) == 1:
+            array = np.array(255 * img[0] / img.max(), dtype=np.uint8)
+            axs[0, i].imshow(array, cmap='gray')
+        elif img.size(0) == 2:
+            array = np.array(255 * img.argmax(dim=0, keepdim=False), dtype=np.uint8)
             axs[0, i].imshow(array, cmap='gray')
         else:
             array = np.array(255 * img / img.max(), dtype=np.uint8)

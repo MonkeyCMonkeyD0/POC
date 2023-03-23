@@ -64,5 +64,5 @@ def evaluation_loop(dataloader, model, metric, device):
             metric.collect_metrics(item_index=idx, img_name=img_name[0], preds=Y_hat, targets=Y)
 
         metric.write_hyperparameters_tensorboard()
-#         metric.write_metric_dataframe()
-#         metric.write_example_segmentation_tensorboard(dataloader, model)
+        metric.write_metric_dataframe()
+        metric.write_example_segmentation_tensorboard(dataloader, model)

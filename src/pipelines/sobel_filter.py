@@ -23,6 +23,7 @@ class SobelFilter(nn.Module):
         self.filter_y.weight = nn.Parameter(kernel_y.expand(1, 3, -1, -1), requires_grad=False)
         self.pad = Pad(padding=1, padding_mode='edge')
 
+    @torch.no_grad()
     def forward(self, img):
         Gx = self.filter_x(img)
         Gy = self.filter_y(img)
