@@ -194,6 +194,10 @@ class POCDataReader(object):
     def __len__(self):
         return len(self.data)
 
+    @property
+    def data(self):
+        return self._data
+
     def split(self, splits):
         assert len(splits) == 3, "Can only cut data into 3 samples"
         splits = np.floor(np.array(splits) * self.__len__()).astype(int)

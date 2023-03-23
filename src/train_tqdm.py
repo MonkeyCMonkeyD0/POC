@@ -27,7 +27,7 @@ def training_loop(epoch, dataloader, model, loss_fn, optimizer, lr_scheduler, me
         # lr_scheduler.step(epoch + batch_idx / len(dataloader))
 
         batch_score = metric.collect_metrics(batch_index=batch_idx, loss_value=loss.item(), preds=Y_hat, targets=Y)
-        dataloader.dataset.set_weight(items_index, 1. - batch_score)
+        # dataloader.dataset.set_weight(items_index, 1. - batch_score)
 
         train_tqdm.set_postfix({"loss": loss.item(),"gpu mem": get_gpu_mem_usage(False)})
 
