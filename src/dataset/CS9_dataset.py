@@ -70,6 +70,9 @@ class CS9Dataset(Dataset):
 
         return [img, mask, original_file, idx]
 
+    def set_weight(self, idx: torch.Tensor, weight: float):
+        pass
+
     def precompute_transform(self, verbose: bool = False):
         item_loop = tqdm(self.data.items(), desc="Applying transform to the Dataset") if verbose else self.data.items()
         for key, (img, mask, file_name) in item_loop:
