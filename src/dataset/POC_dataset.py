@@ -173,7 +173,7 @@ class POCDataReader(object):
         if load_on_gpu != self.load_on_gpu:
             print("Cannot load Dataset on GPU, cuda is not available.")
 
-        self.data = {}
+        self._data = {}
         loop_enum = tenumerate(self._files, desc=f"Loading dataset into {'GPU' if self.load_on_gpu else 'RAM'}", tqdm_class=tqdm) if verbose else enumerate(self._files)
         for i, (img_path, mask_path) in loop_enum:
             if limit is not None and i >= limit:
@@ -183,16 +183,16 @@ class POCDataReader(object):
             mask = read_image(mask_path, mode=ImageReadMode.GRAY)
             file_name = os.path.basename(img_path)
             if self.load_on_gpu:
-                self.data[i] = (img.cuda(), mask.cuda(), file_name)
+                self._data[i] = (img.cuda(), mask.cuda(), file_name)
             else:
-                self.data[i] = (img, mask, file_name)
+                self._data[i] = (img, mask, file_name)
 
         if verbose:
             print("\t- Loading done, {}".format(get_gpu_mem_usage() if self.load_on_gpu else get_ram_usage()))
             print("\t- Got a total of {} images.".format(self.__len__()))
 
     def __len__(self):
-        return len(self.data)
+        return len(self._data)
 
     @property
     def data(self):
