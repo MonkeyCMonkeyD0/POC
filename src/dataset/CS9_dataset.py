@@ -14,7 +14,7 @@ from my_utils import get_gpu_mem_usage, get_ram_usage
 
 
 
-def _get_dataset_files(root_dir: str, mode):
+def _get_dataset_files(root_dir: str, mode: str, skip_test_non_crack=True):
     img_path = os.path.join(root_dir, 'Images')
     mask_path = os.path.join(root_dir, 'Masks')
 
@@ -31,6 +31,8 @@ def _get_dataset_files(root_dir: str, mode):
 
     items = []
     for it_file in file_list:
+        if skip_test_non_crack and mode == "Test" and it_file.startswith('noncrack_'):
+            continue
         item = (os.path.join(img_path, it_file), os.path.join(mask_path, it_file))
         if os.path.isfile(item[0]) and os.path.isfile(item[1]):
             items.append(item)
