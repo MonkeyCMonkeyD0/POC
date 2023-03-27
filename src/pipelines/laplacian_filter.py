@@ -5,7 +5,7 @@ from torch.nn.functional import threshold
 
 
 class LaplacianFilter(nn.Module):
-    def __init__(self, gaussian_smoothed=True):
+    def __init__(self, gaussian_smoothed: bool = True):
         super().__init__()
         self.smooth = gaussian_smoothed
         self.gaussian_blur = GaussianBlur(kernel_size=7, sigma=2)
@@ -15,9 +15,10 @@ class LaplacianFilter(nn.Module):
             [-1., 4., -1.],
             [0., -1., 0.]])
         self.laplacian_filter.weight = nn.Parameter(kernel.expand(1, 3, -1, -1), requires_grad=False)
+        self.laplacian_filter = self.laplacian_filter
         self.pad = Pad(padding=1, padding_mode='edge')
 
-    @torch.no_grad()
+    @torch.inference_mode()
     def forward(self, img):
         if self.smooth:
             img = self.gaussian_blur(img)

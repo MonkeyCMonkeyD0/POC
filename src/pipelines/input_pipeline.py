@@ -22,7 +22,7 @@ class InputPipeline(nn.Module):
 
         self._nb_channel = 3 + (len(self.layer_transformer) if self.layer_transformer is not None else 0)
 
-    @torch.no_grad()
+    @torch.inference_mode()
     def forward(self, img):
         n_channel = img.shape[-3]
         if self.layer_transformer is not None:
