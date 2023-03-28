@@ -33,24 +33,24 @@ class Metrics(nn.Module):
         if not isinstance(self.hyperparameters['Optimizer'], str):
             self.hyperparameters['Optimizer'] = self.hyperparameters['Optimizer'].__name__
         if not isinstance(self.hyperparameters['Combine Loss'], str):
-            self.hyperparameters['Combine Loss'] = self.hyperparameters['Combine Loss'].__name__  
+            self.hyperparameters['Combine Loss'] = self.hyperparameters['Combine Loss'].__name__
+
+        if self.hyperparameters['Input Filter'] is None:
+            self.hyperparameters['Input Filter'] = '_'
+        elif not isinstance(self.hyperparameters['Input Filter'], str):
+            self.hyperparameters['Input Filter'] = self.hyperparameters['Input Filter'].__name__
 
         self.hyperparameters['Pixel Loss'] = str(self.hyperparameters['Pixel Loss'])
         self.hyperparameters['Volume Loss'] = str(self.hyperparameters['Volume Loss'])
         self.hyperparameters['Input Layer'] = str(self.hyperparameters['Input Layer'])
 
-        if self.hyperparameters['Input Filter'] is None:
-            self.hyperparameters['Input Filter'] = "None"
-        elif not isinstance(self.hyperparameters['Input Filter'], str):
-            self.hyperparameters['Input Filter'] = self.hyperparameters['Input Filter'].__name__
-
         flags = "" + ("-NM" if self.hyperparameters['Negative Mining'] else "") + ("-SL" if self.hyperparameters['Smooth Labeling'] else "")
-
         self.log_folder = f"../logs/N:{self.hyperparameters['Network']}-O:{self.hyperparameters['Optimizer']}"
         self.log_folder += f"-L:{self.hyperparameters['Combine Loss']}_{self.hyperparameters['Pixel Loss']}_{self.hyperparameters['Volume Loss']}"
         self.log_folder += f"-P:{self.hyperparameters['Input Filter']}_{self.hyperparameters['Input Layer']}"
         self.log_folder += f"-BS:{self.hyperparameters['Batch Size']}-LR:{self.hyperparameters['Learning Rate']:.1e}{flags}/{mode}"
         self.writer = SummaryWriter(self.log_folder, max_queue=4)
+
 
     @property
     def loss(self):
