@@ -6,12 +6,13 @@ from torchvision.transforms import Compose
 class InputPipeline(nn.Module):
     def __init__(self, transformer = None, layer_transformer = None):
         super().__init__()
+
         if isinstance(transformer, list):
             self.transformer = transformer
-        elif isinstance(transformer, nn.Module):
-            self.transformer = [transformer]
-        else:
+        elif transformer is None:
             self.transformer = None
+        else:
+            self.transformer = [transformer]
 
         if isinstance(layer_transformer, list):
             self.layer_transformer = nn.ModuleList(layer_transformer)
