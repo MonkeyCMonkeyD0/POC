@@ -31,7 +31,10 @@ class SobelFilter(nn.Module):
         Gy = self.pad(Gy)
         Gx = torch.square(Gx)
         Gy = torch.square(Gy)
-        return torch.sqrt(Gx + Gy)
+        res = torch.sqrt(Gx + Gy)
+        res -= res.min()
+        res /= res.max()
+        return res
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}"

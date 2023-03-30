@@ -17,6 +17,8 @@ class FrangiFilter(nn.Module):
         numpy_img = gray_img.cpu().numpy()
         result = frangi(numpy_img, black_ridges=self.black_ridges)
         img = torch.from_numpy(result).expand(1, -1, -1)
+        img -= img.min()
+        img /= img.max()
         return img.to(input_device)
 
     def __repr__(self) -> str:

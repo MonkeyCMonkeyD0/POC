@@ -34,7 +34,7 @@ class InputPipeline(nn.Module):
             img[0:n_channel] = Compose(self.transformer)(img[0:n_channel])
         return img
 
-    @property    
+    @property
     def nb_channel(self):
         return self._nb_channel
 
