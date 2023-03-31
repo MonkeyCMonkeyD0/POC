@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 from torch.nn.functional import interpolate
+from torchvision.models import vision_transformer
 
 
 class DINOFilter(nn.Module):
