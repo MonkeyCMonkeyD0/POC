@@ -1,8 +1,6 @@
 import numpy as np
 
-from skimage.filters import frangi
 from skimage.segmentation import watershed
-from skimage.morphology import skeletonize
 
 import torch
 from torch import nn

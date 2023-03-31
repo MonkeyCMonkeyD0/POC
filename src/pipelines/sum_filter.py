@@ -1,7 +1,5 @@
 import torch
 from torch import nn
-from torchvision.transforms import Compose
-
 
 
 class SumFilters(nn.Module):
@@ -14,8 +12,8 @@ class SumFilters(nn.Module):
         res = torch.zeros_like(img)[0:1]
         for f in self.filters:
             res += f(img)
-        # res -= res.min()
-        # res /= res.max()
+        res -= res.min()
+        res /= res.max()
         return res
 
     def __repr__(self):
