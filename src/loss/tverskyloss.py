@@ -20,8 +20,8 @@ class TverskyLoss(TverskyIndex):
         tversky_index = super().forward(preds, targets).requires_grad_(True)
         return 1. - tversky_index
 
-    def __repr__(self):
-        return self.__class__.__name__
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}"
 
 
 class FocalTverskyLoss(TverskyLoss):
@@ -42,5 +42,6 @@ class FocalTverskyLoss(TverskyLoss):
         tversky_loss = super().forward(preds, targets).requires_grad_(True)
         return tversky_loss ** self.gamma
 
-    def __repr__(self):
-        return self.__class__.__name__
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}"
+

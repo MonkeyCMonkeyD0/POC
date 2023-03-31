@@ -46,8 +46,9 @@ class FocalLoss(nn.Module):
 
         self.ce_loss = nn.CrossEntropyLoss(weight=self.alpha, reduction='none', ignore_index=ignore_index)
 
-    def __repr__(self):
-        return self.__class__.__name__
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}"
+
 
     # def __repr__(self):
     #     arg_keys = ['alpha', 'gamma', 'ignore_index', 'reduction']
