@@ -6,7 +6,7 @@ class SequenceFilters(nn.Module):
     def __init__(self, *filters):
         super().__init__()
         self.filters_name = [str(f) for f in filters]
-        self.filters = nn.Sequential(filters)
+        self.filters = nn.Sequential(*filters)
 
     @torch.inference_mode()
     def forward(self, img):
