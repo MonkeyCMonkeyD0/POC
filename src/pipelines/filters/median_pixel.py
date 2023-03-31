@@ -19,8 +19,5 @@ class MedianPixelFilter(nn.Module):
         res = torch.where(gray_img == median_pixel, 1, 0)
         return res.to(input_device)
 
-    def __repr__(self):
-        return self.__class__.__name__
-
-    def __str__(self):
-        return self.__class__.__name__
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}"

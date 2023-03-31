@@ -15,8 +15,5 @@ class BinaryFilter(nn.Module):
         res = (gray_img >= threshold).int()
         return res
 
-    def __repr__(self):
-        return self.__class__.__name__
-        
-    def __str__(self):
-        return self.__class__.__name__
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}"

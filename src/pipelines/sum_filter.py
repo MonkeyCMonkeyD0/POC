@@ -17,7 +17,7 @@ class SumFilters(nn.Module):
         return res
 
     def __repr__(self):
-        return (self.__class__.__name__, *[str(f) for f in self.filters])
+        return str((self.__class__.__name__, *[str(f) for f in self.filters]))
         
     def __str__(self):
         return "{}({})".format(self.__class__.__name__, "+".join([str(f) for f in self.filters]))

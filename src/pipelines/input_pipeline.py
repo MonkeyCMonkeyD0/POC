@@ -40,9 +40,9 @@ class InputPipeline(nn.Module):
         return self._nb_channel
 
     def __repr__(self):
-        return (self.__class__.__name__,
+        return str((self.__class__.__name__,
             ",".join([t.__name__ for t in self.transformer]) if self.transformer is not None else "_",
-            ",".join([str(t) for t in self.layer_transformer]) if self.layer_transformer is not None else "_")
+            ",".join([str(t) for t in self.layer_transformer]) if self.layer_transformer is not None else "_"))
         
     def __str__(self):
         return "{}({}+{})".format(

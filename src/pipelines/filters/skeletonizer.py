@@ -17,8 +17,5 @@ class SkeletonFilter(nn.Module):
         res = torch.from_numpy(skeleton).expand(1, -1, -1).int()
         return res.to(input_device)
 
-    def __repr__(self):
-        return self.__class__.__name__
-
-    def __str__(self):
-        return self.__class__.__name__
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}"
