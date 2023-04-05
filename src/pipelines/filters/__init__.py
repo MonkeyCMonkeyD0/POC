@@ -1,6 +1,7 @@
-__all__ = ['BinaryFilter', 'DINOFilter', 'FrangiFilter', 'LaplacianFilter', 'MedianPixelFilter', 'SatoFilter', 'SkeletonFilter', 'SobelFilter', 'WatershedFilter']
+__all__ = ['CrackBinaryFilter', 'BGBinaryFilter', 'DINOFilter', 'FrangiFilter', 'LaplacianFilter', 'MedianPixelFilter', 'SatoFilter', 'SkeletonFilter', 'SobelFilter', 'WatershedFilter']
 
-from .binarizer import BinaryFilter
+from .crack_binarizer import CrackBinaryFilter
+from .bg_binarizer import BGBinaryFilter
 from .dino_vits import DINOFilter
 from .frangi import FrangiFilter
 from .laplacian import LaplacianFilter

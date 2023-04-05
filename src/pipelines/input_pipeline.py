@@ -39,13 +39,13 @@ class InputPipeline(nn.Module):
     def nb_channel(self):
         return self._nb_channel
 
-    def __repr__(self):
-        return str((self.__class__.__name__,
-            ",".join([t.__name__ for t in self.transformer]) if self.transformer is not None else "_",
-            ",".join([str(t) for t in self.layer_transformer]) if self.layer_transformer is not None else "_"))
+    def get_names(self):
+        return (self.__class__.__name__,
+            ",".join([t.__name__ for t in self.transformer]) if self.transformer is not None else " ",
+            ",".join([str(t) for t in self.layer_transformer]) if self.layer_transformer is not None else " ")
         
     def __str__(self):
         return "{}({}+{})".format(
             self.__class__.__name__,
-            ",".join([t.__name__ for t in self.transformer]) if self.transformer is not None else "_",
-            ",".join([str(t) for t in self.layer_transformer]) if self.layer_transformer is not None else "_")
+            ",".join([t.__name__ for t in self.transformer]) if self.transformer is not None else " ",
+            ",".join([str(t) for t in self.layer_transformer]) if self.layer_transformer is not None else " ")
