@@ -36,7 +36,7 @@ class Metrics(nn.Module):
             self.hyperparameters['Combine Loss'] = self.hyperparameters['Combine Loss'].__name__
 
         if self.hyperparameters['Input Filter'] is None:
-            self.hyperparameters['Input Filter'] = '_'
+            self.hyperparameters['Input Filter'] = ' '
         elif not isinstance(self.hyperparameters['Input Filter'], str):
             self.hyperparameters['Input Filter'] = self.hyperparameters['Input Filter'].__name__
 
@@ -76,9 +76,9 @@ class Metrics(nn.Module):
         preds, targets = preds.detach(), targets.detach()
 
         self._losses[batch_index] = loss_value
-        self._scores_crack_IOU[batch_index] = self.jaccardCrackIndex.forward(preds, targets)
-        self._scores_mean_IOU[batch_index] = self.jaccardMeanIndex.forward(preds, targets)
-        self._scores_Tversky[batch_index] = self.tverskyIndex.forward(preds, targets)
+        self._scores_crack_IOU[batch_index] = self.jaccardCrackIndex(preds, targets)
+        self._scores_mean_IOU[batch_index] = self.jaccardMeanIndex(preds, targets)
+        self._scores_Tversky[batch_index] = self.tverskyIndex(preds, targets)
 
         return self._scores_crack_IOU[batch_index]
 
@@ -150,12 +150,12 @@ class EvaluationMetrics(Metrics):
         with torch.inference_mode():
             preds = model(images)
 
+            if isinstance(preds, tuple):
+                preds = preds[0]
+
             images = (255 * images).byte()
             masks = (255 * masks).byte()
             preds = (255 * preds.argmax(dim=1, keepdim=True)).byte()
 
         img_tensor = torch.cat((images[:, 0:3].cpu(), preds.expand(-1, 3, -1, -1).cpu(), masks.expand(-1, 3, -1, -1).cpu()), dim=0)
         self.writer.add_images(f"Segmentation example ({files})", img_tensor, dataformats='NCHW')
-
-        # def write_model_graph_tensorboard(self, model: nn.Module, images):
-        #     self.writer.add_graph(model, input_to_model=images.to(self.device))

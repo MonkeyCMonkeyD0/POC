@@ -81,6 +81,7 @@ class UNet(nn.Module):
         self.up3 = Up(256, 128 // factor, bilinear=self.bilinear, crop=self.crop)
         self.up4 = Up(128, 64, bilinear=self.bilinear, crop=self.crop)
         self.out_conv = nn.Conv2d(64, n_classes, 1)
+        self.sigmoid = nn.Softmax(dim=1)
 
     def forward(self, x):
         x1 = self.in_conv(x)
@@ -93,4 +94,8 @@ class UNet(nn.Module):
         x = self.up3(x, x2)
         x = self.up4(x, x1)
         logits = self.out_conv(x)
-        return logits
+        pred = self.sigmoid(logits)
+        return pred
+
+    def __repr__(self) -> str:
+        return str(self.__class__.__name__)

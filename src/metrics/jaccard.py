@@ -2,15 +2,6 @@ import torch
 from torch import nn
 
 
-
-def _transform_inputs(preds: torch.Tensor, targets: torch.Tensor, mesure_background=False):
-    preds = preds.softmax(dim=1)
-    if not mesure_background:
-        preds = preds[:,1:]
-        targets = targets[:,1:]
-    return preds, targets
-
-
 class JaccardIndex(nn.Module):
     r"""The Jaccard index, also known as the Jaccard similarity coefficient or Intersection Over Union
 
@@ -23,7 +14,9 @@ class JaccardIndex(nn.Module):
         self.register_buffer("smooth", torch.tensor(smooth, dtype=torch.float))
 
     def forward(self, preds: torch.Tensor, targets: torch.Tensor):
-        preds, targets = _transform_inputs(preds, targets, mesure_background=self.mesure_background)
+        if not self.mesure_background:
+            preds = preds[:,1:]
+            targets = targets[:,1:]
 
         intersection = torch.sum(targets * preds, dim=(0, 2, 3), dtype=torch.float)
         union = torch.sum(targets, dim=(0, 2, 3), dtype=torch.float) + torch.sum(preds, dim=(0, 2, 3), dtype=torch.float) - intersection
@@ -45,7 +38,9 @@ class PowerJaccardIndex(nn.Module):
         self.register_buffer("smooth", torch.tensor(smooth, dtype=torch.float))
 
     def forward(self, preds: torch.Tensor, targets: torch.Tensor):
-        preds, targets = _transform_inputs(preds, targets, mesure_background=self.mesure_background)
+        if not self.mesure_background:
+            preds = preds[:,1:]
+            targets = targets[:,1:]
 
         intersection = torch.sum(targets * preds, dim=(0, 2, 3), dtype=torch.float)
         union = torch.sum(targets, dim=(0, 2, 3), dtype=torch.float)**self.p + torch.sum(preds, dim=(0, 2, 3), dtype=torch.float)**self.p - intersection

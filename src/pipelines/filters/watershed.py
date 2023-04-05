@@ -8,23 +8,25 @@ from torchvision.transforms.functional import rgb_to_grayscale
 
 
 class WatershedFilter(nn.Module):
-    def __init__(self, processing_filter: nn.Module):
+    def __init__(self, background_filter: nn.Module, foreground_filter: nn.Module):
         super().__init__()
-        self.filter = processing_filter
+        self.background_filter = background_filter
+        self.foreground_filter = foreground_filter
 
     @torch.inference_mode()
     def forward(self, img):
         input_device = img.device
 
-        filter_res = self.filter(img).squeeze(0)
-        markers = torch.zeros_like(filter_res)
-        markers[filter_res >= filter_res.quantile(.9925)] = 2
-        markers[filter_res <= filter_res.quantile(.9825)] = 1
-        markers = markers.cpu().numpy()
+        background = self.background_filter(img)
+        foreground = self.foreground_filter(img)
+        markers = background + 2 * foreground
+        markers = markers.squeeze(0).cpu().numpy()
 
-        gray_img = rgb_to_grayscale(img).squeeze(0)
-        numpy_img = gray_img.cpu().numpy()
-        result = watershed(numpy_img, markers=markers)
+        gray_img = rgb_to_grayscale(img)
+        gray_img -= gray_img.min()
+        gray_img /= gray_img.max()
+        numpy_img = gray_img.squeeze(0).cpu().numpy()
+        result = watershed(numpy_img, markers=markers, connectivity=1, compactness=1.)
         img = torch.from_numpy(result).expand(1, -1, -1).float()
         img -= img.min()
         img /= img.max()

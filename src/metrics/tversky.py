@@ -21,8 +21,6 @@ class TverskyIndex(nn.Module):
         self.beta = torch.tensor(beta, dtype=torch.float)
 
     def forward(self, preds: torch.Tensor, targets: torch.Tensor):
-        preds = preds.softmax(dim=1)
-
         TP = torch.sum(preds[:,1] * targets[:,1], dtype=torch.float)
         FP = torch.sum(preds[:,1] * targets[:,0], dtype=torch.float)
         FN = torch.sum(preds[:,0] * targets[:,1], dtype=torch.float)

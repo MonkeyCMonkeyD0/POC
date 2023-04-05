@@ -11,7 +11,8 @@ class SumFilters(nn.Module):
     def forward(self, img):
         res = torch.zeros_like(img)[0:1]
         for f in self.filters:
-            res += f(img)
+            layer = f(img)
+            res += layer * (1. - layer.mean())
         res -= res.min()
         res /= res.max()
         return res

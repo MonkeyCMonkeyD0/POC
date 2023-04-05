@@ -26,6 +26,8 @@ def training_loop(epoch, dataloader, model, loss_fn, optimizer, lr_scheduler, me
         optimizer.step()
         # lr_scheduler.step(epoch + batch_idx / len(dataloader))
 
+        if isinstance(Y_hat, tuple):
+            Y_hat = Y_hat[0]
         batch_score = metric.collect_metrics(batch_index=batch_idx, loss_value=loss.item(), preds=Y_hat, targets=Y)
         # dataloader.dataset.set_weight(items_index, 1. - batch_score)
 
@@ -46,6 +48,8 @@ def validation_loop(epoch, dataloader, model, loss_fn, metric, device):
             Y_hat = model(X)
             loss_val = loss_fn(Y_hat, Y).item()
 
+            if isinstance(Y_hat, tuple):
+                Y_hat = Y_hat[0]
             metric.collect_metrics(batch_index=batch_idx, loss_value=loss_val, preds=Y_hat, targets=Y)
             val_tqdm.set_postfix({"loss": loss_val,"gpu mem": get_gpu_mem_usage(False)})
 
@@ -61,6 +65,8 @@ def evaluation_loop(dataloader, model, metric, device):
             X = X.to(device); Y = Y.to(device)
 
             Y_hat = model(X)
+            if isinstance(Y_hat, tuple):
+                Y_hat = Y_hat[0]
             metric.collect_metrics(item_index=idx, img_name=img_name[0], preds=Y_hat, targets=Y)
 
         metric.write_hyperparameters_tensorboard()
