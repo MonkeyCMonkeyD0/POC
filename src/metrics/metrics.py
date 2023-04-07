@@ -25,6 +25,7 @@ class Metrics(nn.Module):
         self.jaccardMeanIndex = JaccardIndex(mesure_background=True, smooth=smooth).to(self.device)
         self.tverskyIndex = TverskyIndex(alpha=.3, beta=.7, smooth=smooth).to(self.device)
 
+        self.hyperparameters = {}
         self.hyperparameters['Network'] = hyperparam['Network'].__name__
         self.hyperparameters['Optimizer'] = hyperparam['Optimizer'].__name__
 
