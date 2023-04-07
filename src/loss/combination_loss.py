@@ -11,7 +11,7 @@ class CombinedLoss(nn.Module):
         self.ratio = ratio
 
     def get_names(self):
-        return self.__class__.__name__, self.loss1.__class__.__name__, self.loss2.__class__.__name__, f"{self.ratio:.2}"
+        return self.__class__.__name__, self.loss1.__class__.__name__, self.loss2.__class__.__name__
 
     def __str__(self):
         return f"{self.__class__.__name__}({str(self.loss1)}+{str(self.loss2)})"
@@ -29,7 +29,7 @@ class BorderedLoss(nn.Module):
         self.register_buffer("kernel", torch.Tensor([[[[-1, -1, -1],[-1, 8, -1],[-1, -1, -1]]]]), persistent=False)
 
     def get_names(self):
-        return self.__class__.__name__, self.border_loss.__class__.__name__, self.volume_loss.__class__.__name__, f"{self.ratio:.2}"
+        return self.__class__.__name__, self.border_loss.__class__.__name__, self.volume_loss.__class__.__name__
 
     def __str__(self):
         return f"{self.__class__.__name__}({str(self.border_loss)}+{str(self.volume_loss)})"

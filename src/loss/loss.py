@@ -9,7 +9,7 @@ class PixelLoss(nn.Module):
         self.pixel_loss = pixel_loss
 
     def get_names(self):
-        return self.__class__.__name__, self.pixel_loss.__class__.__name__
+        return self.__class__.__name__, self.pixel_loss.__class__.__name__, ' '
 
     def __str__(self):
         return f"{self.__class__.__name__}:{str(self.pixel_loss)}"
@@ -23,7 +23,7 @@ class VolumeLoss(nn.Module):
         self.volume_loss = volume_loss
 
     def get_names(self):
-        return self.__class__.__name__, self.volume_loss.__class__.__name__
+        return self.__class__.__name__, ' ', self.volume_loss.__class__.__name__
 
     def __str__(self):
         return f"{self.__class__.__name__}:{str(self.volume_loss)}"

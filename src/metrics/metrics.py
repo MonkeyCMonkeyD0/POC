@@ -14,6 +14,7 @@ class Metrics(nn.Module):
     def __init__(self, buffer_size, mode: str, hyperparam: dict, smooth=1e-7, device=None):
         super(Metrics, self).__init__()
 
+        assert mode in ["Training", "Validation", "Evaluation"]
         self.device = device
         self.register_buffer("_losses", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
         self.register_buffer("_scores_crack_IOU", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
@@ -24,32 +25,23 @@ class Metrics(nn.Module):
         self.jaccardMeanIndex = JaccardIndex(mesure_background=True, smooth=smooth).to(self.device)
         self.tverskyIndex = TverskyIndex(alpha=.3, beta=.7, smooth=smooth).to(self.device)
 
-        assert mode in ["Training", "Validation", "Evaluation"]
+        self.hyperparameters['Network'] = hyperparam['Network'].__name__
+        self.hyperparameters['Optimizer'] = hyperparam['Optimizer'].__name__
 
-        self.hyperparameters = {k: v for k,v in hyperparam.items()}
+        self.hyperparameters['Combine Loss'], self.hyperparameters['Pixel Loss'], self.hyperparameters['Volume Loss'] = hyperparam['Loss Function'].get_names()
+        _, self.hyperparameters['Input Filter'], self.hyperparameters['Input Layer'] = hyperparam['Input Pipeline'].get_names()
 
-        if not isinstance(self.hyperparameters['Network'], str):
-            self.hyperparameters['Network'] = self.hyperparameters['Network'].__name__
-        if not isinstance(self.hyperparameters['Optimizer'], str):
-            self.hyperparameters['Optimizer'] = self.hyperparameters['Optimizer'].__name__
-        if not isinstance(self.hyperparameters['Combine Loss'], str):
-            self.hyperparameters['Combine Loss'] = self.hyperparameters['Combine Loss'].__name__
-
-        if self.hyperparameters['Input Filter'] is None:
-            self.hyperparameters['Input Filter'] = ' '
-        elif not isinstance(self.hyperparameters['Input Filter'], str):
-            self.hyperparameters['Input Filter'] = self.hyperparameters['Input Filter'].__name__
-
-        self.hyperparameters['Pixel Loss'] = str(self.hyperparameters['Pixel Loss'])
-        self.hyperparameters['Volume Loss'] = str(self.hyperparameters['Volume Loss'])
-        self.hyperparameters['Input Layer'] = str(self.hyperparameters['Input Layer'])
+        self.hyperparameters['Negative Mining'] = bool(hyperparam['Negative Mining'])
+        self.hyperparameters['Smooth Labeling'] = bool(hyperparam['Smooth Labeling'])
+        self.hyperparameters['Batch Size'] = int(hyperparam['Batch Size'])
+        self.hyperparameters['Learning Rate'] = float(hyperparam['Learning Rate'])
 
         flags = "" + ("-NM" if self.hyperparameters['Negative Mining'] else "") + ("-SL" if self.hyperparameters['Smooth Labeling'] else "")
         self.log_folder = f"../logs/N:{self.hyperparameters['Network']}-O:{self.hyperparameters['Optimizer']}"
         self.log_folder += f"-L:{self.hyperparameters['Combine Loss']}_{self.hyperparameters['Pixel Loss']}_{self.hyperparameters['Volume Loss']}"
         self.log_folder += f"-P:{self.hyperparameters['Input Filter']}_{self.hyperparameters['Input Layer']}"
         self.log_folder += f"-BS:{self.hyperparameters['Batch Size']}-LR:{self.hyperparameters['Learning Rate']:.1e}{flags}/{mode}"
-        self.writer = SummaryWriter(self.log_folder, max_queue=4)
+        self.writer = SummaryWriter(self.log_folder, max_queue=20)
 
 
     @property
@@ -95,6 +87,7 @@ class Metrics(nn.Module):
         self.writer.add_scalar("Indexes/Tversky", self.tversky, epoch, new_style=True)
         if lr is not None:
             self.writer.add_scalar("Learning Rate", lr, epoch, new_style=True)
+        self.writer.flush()
 
     def close_tensorboard(self):
         self.writer.flush()
