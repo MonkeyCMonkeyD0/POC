@@ -2,9 +2,6 @@
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import torchvision.transforms as transforms
-
 
 
 def convolution(in_channels, out_channels):
@@ -137,6 +134,3 @@ class DeepCrack(nn.Module):
 
     def __repr__(self) -> str:
         return str(self.__class__.__name__)
-
-    def __str__(self) -> str:
-        return super(DeepCrack, self).__str__()
