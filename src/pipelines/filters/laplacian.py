@@ -5,9 +5,10 @@ from torch.nn.functional import threshold
 
 
 class LaplacianFilter(nn.Module):
-    def __init__(self, gaussian_smoothed: bool = True):
+    def __init__(self, threshold: float = 2., gaussian_smoothed: bool = True):
         super().__init__()
         self.smooth = gaussian_smoothed
+        self.threshold = 1. - threshold / 100
         self.gaussian_blur = GaussianBlur(kernel_size=7, sigma=2)
         self.laplacian_filter = nn.Conv2d(in_channels=3, out_channels=1, groups=1, kernel_size=3, stride=1, padding='valid', bias=False)
         kernel = torch.tensor([
@@ -25,7 +26,7 @@ class LaplacianFilter(nn.Module):
         img = self.laplacian_filter(img)
         img = self.pad(img)
 
-        img = threshold(img, threshold=img.quantile(.98), value=0)
+        img = threshold(img, threshold=img.quantile(self.threshold), value=0)
         img -= img.min()
         img /= img.max()
         return img

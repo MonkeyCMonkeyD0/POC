@@ -26,21 +26,29 @@ class Metrics(nn.Module):
         self.tverskyIndex = TverskyIndex(alpha=.3, beta=.7, smooth=smooth).to(self.device)
 
         self.hyperparameters = {}
-        self.hyperparameters['Network'] = hyperparam['Network'].__name__
-        self.hyperparameters['Optimizer'] = hyperparam['Optimizer'].__name__
+        for param, value in hyperparam.items():
+            if isinstance(value, (float, int, bool, str)):
+                self.hyperparameters[param] = value
+            elif type(value).__name__ == 'type' or type(value).__name__ == 'function':
+                self.hyperparameters[param] = value.__name__
+            else:
+                self.hyperparameters[param] = type(value).__name__
 
-        self.hyperparameters['Combine Loss'], self.hyperparameters['Pixel Loss'], self.hyperparameters['Volume Loss'] = hyperparam['Loss Function'].get_names()
-        _, self.hyperparameters['Input Filter'], self.hyperparameters['Input Layer'] = hyperparam['Input Pipeline'].get_names()
+        # self.hyperparameters['Network'] = hyperparam['Network'].__name__
+        # self.hyperparameters['Optimizer'] = hyperparam['Optimizer'].__name__
 
-        self.hyperparameters['Negative Mining'] = bool(hyperparam['Negative Mining'])
-        self.hyperparameters['Smooth Labeling'] = bool(hyperparam['Smooth Labeling'])
-        self.hyperparameters['Batch Size'] = int(hyperparam['Batch Size'])
-        self.hyperparameters['Learning Rate'] = float(hyperparam['Learning Rate'])
+        # self.hyperparameters['Combine Loss'], self.hyperparameters['Pixel Loss'], self.hyperparameters['Volume Loss'] = hyperparam['Loss Function'].get_names()
+        # _, self.hyperparameters['Input Filter'], self.hyperparameters['Input Layer'] = hyperparam['Input Pipeline'].get_names()
+
+        # self.hyperparameters['Negative Mining'] = bool(hyperparam['Negative Mining'])
+        # self.hyperparameters['Smooth Labeling'] = bool(hyperparam['Smooth Labeling'])
+        # self.hyperparameters['Batch Size'] = int(hyperparam['Batch Size'])
+        # self.hyperparameters['Learning Rate'] = float(hyperparam['Learning Rate'])
 
         flags = "" + ("-NM" if self.hyperparameters['Negative Mining'] else "") + ("-SL" if self.hyperparameters['Smooth Labeling'] else "")
         self.log_folder = f"../logs/N:{self.hyperparameters['Network']}-O:{self.hyperparameters['Optimizer']}"
-        self.log_folder += f"-L:{self.hyperparameters['Combine Loss']}_{self.hyperparameters['Pixel Loss']}_{self.hyperparameters['Volume Loss']}"
-        self.log_folder += f"-P:{self.hyperparameters['Input Filter']}_{self.hyperparameters['Input Layer']}"
+        self.log_folder += f"-L:{self.hyperparameters['Loss Combiner']}_{self.hyperparameters['Loss Pixel']}_{self.hyperparameters['Loss Volume']}"
+        self.log_folder += f"-P:{self.hyperparameters['Pipe Filter']}_{self.hyperparameters['Pipe Layer']}"
         self.log_folder += f"-BS:{self.hyperparameters['Batch Size']}-LR:{self.hyperparameters['Learning Rate']:.1e}{flags}/{mode}"
         self.writer = SummaryWriter(self.log_folder, max_queue=20)
 
