@@ -72,7 +72,7 @@ def data_augment_(data, n: int, load_on_gpu: bool = False, verbose: bool = False
                 new_img = transforms.functional.rotate(new_img, angle=angle)
                 new_mask = transforms.functional.rotate(new_mask, angle=angle)
             if random_mod[7]:     # Crop
-                crop_size = tuple(int(np.random.uniform(x/2, x)) for x in img_size)             # [240; 320] to [480; 640]
+                crop_size = tuple(int(np.random.uniform(3*x/4, x)) for x in img_size)             # [240; 320] to [480; 640]
                 params = transforms.RandomCrop.get_params(new_img, output_size=crop_size)
                 new_img = transforms.functional.crop(new_img, *params)
                 new_img = transforms.functional.resize(new_img, size=img_size)
