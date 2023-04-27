@@ -84,12 +84,12 @@ class Metrics(nn.Module):
         return self._scores_crack_IOU[batch_index]
 
     def write_epoch_tensorboard(self, epoch, lr=None):
-        if self.hyperparameters['Combine Loss'] == "PixelLoss":
-            loss_name = f"Losses/{self.hyperparameters['Pixel Loss']}"
-        elif self.hyperparameters['Combine Loss'] == "VolumeLoss":
-            loss_name = f"Losses/{self.hyperparameters['Volume Loss']}"
+        if self.hyperparameters['Loss Combiner'] == "PixelLoss":
+            loss_name = f"Losses/{self.hyperparameters['Loss Pixel']}"
+        elif self.hyperparameters['Loss Combiner'] == "VolumeLoss":
+            loss_name = f"Losses/{self.hyperparameters['Loss Volume']}"
         else:
-            loss_name = f"Losses/{self.hyperparameters['Combine Loss']}-{self.hyperparameters['Pixel Loss']}-{self.hyperparameters['Volume Loss']}"
+            loss_name = f"Losses/{self.hyperparameters['Loss Combiner']}-{self.hyperparameters['Loss Pixel']}-{self.hyperparameters['Loss Volume']}"
         self.writer.add_scalar(loss_name, self.loss, epoch, new_style=True)
         self.writer.add_scalar("Indexes/Crack IOU", self.crackIoU, epoch, new_style=True)
         self.writer.add_scalar("Indexes/Mean IOU", self.meanIoU, epoch, new_style=True)
