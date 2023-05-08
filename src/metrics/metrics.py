@@ -34,17 +34,6 @@ class Metrics(nn.Module):
             else:
                 self.hyperparameters[param] = type(value).__name__
 
-        # self.hyperparameters['Network'] = hyperparam['Network'].__name__
-        # self.hyperparameters['Optimizer'] = hyperparam['Optimizer'].__name__
-
-        # self.hyperparameters['Combine Loss'], self.hyperparameters['Pixel Loss'], self.hyperparameters['Volume Loss'] = hyperparam['Loss Function'].get_names()
-        # _, self.hyperparameters['Input Filter'], self.hyperparameters['Input Layer'] = hyperparam['Input Pipeline'].get_names()
-
-        # self.hyperparameters['Negative Mining'] = bool(hyperparam['Negative Mining'])
-        # self.hyperparameters['Smooth Labeling'] = bool(hyperparam['Smooth Labeling'])
-        # self.hyperparameters['Batch Size'] = int(hyperparam['Batch Size'])
-        # self.hyperparameters['Learning Rate'] = float(hyperparam['Learning Rate'])
-
         flags = "" + ("-NM" if self.hyperparameters['Negative Mining'] else "") + ("-SL" if self.hyperparameters['Smooth Labeling'] else "")
         self.log_folder = f"../logs/N:{self.hyperparameters['Network']}-O:{self.hyperparameters['Optimizer']}"
         self.log_folder += f"-L:{self.hyperparameters['Loss Combiner']}_{self.hyperparameters['Loss Pixel']}_{self.hyperparameters['Loss Volume']}"
