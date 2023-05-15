@@ -31,10 +31,15 @@ def _get_dataset_files(root_dir: str):
     return items
 
 
-def data_augment_(data, n: int, load_on_gpu: bool = False, verbose: bool = False):
+def data_augment_(data, n: int, load_on_gpu: bool = False, verbose: bool = False, seed: int = None):
     if n <= 0:
         warnings.warn("Need a strictly positive integer for n for data augmentation. Will skip augmentation.")
         return None
+
+    if seed is not None:
+        rng = np.random.RandomState(seed)
+    else:
+        rng = np.random
 
     original_dataset_lenght = len(data)
     loop = trange(original_dataset_lenght, desc="Expending the dataset {} more times".format(n)) if verbose else range(original_dataset_lenght)
@@ -47,7 +52,7 @@ def data_augment_(data, n: int, load_on_gpu: bool = False, verbose: bool = False
                 new_img = new_img.cuda()
                 new_mask = new_mask.cuda()
 
-            random_mod = np.random.choice([0, 1], size=10, p=[.8, .2])    # Proba of 0.2 for each event = ~2 transformations
+            random_mod = rng.choice([0, 1], size=10, p=[.8, .2])    # Proba of 0.2 for each event = ~2 transformations
 
             # non-spacial variations (only on image)
             if random_mod[0]:     # Brightness shift
@@ -55,7 +60,7 @@ def data_augment_(data, n: int, load_on_gpu: bool = False, verbose: bool = False
             if random_mod[1]:     # Autocontrast
                 new_img = transforms.functional.autocontrast(new_img)
             if random_mod[2]:     # Sharpness
-                new_img = transforms.functional.adjust_sharpness(new_img, sharpness_factor=np.random.uniform(0, 2))
+                new_img = transforms.functional.adjust_sharpness(new_img, sharpness_factor=rng.uniform(0, 2))
             if random_mod[3]:     # Gaussian Blur
                 new_img = transforms.functional.gaussian_blur(new_img, kernel_size=5)
 
@@ -68,11 +73,11 @@ def data_augment_(data, n: int, load_on_gpu: bool = False, verbose: bool = False
                 new_img = transforms.functional.hflip(new_img)
                 new_mask = transforms.functional.hflip(new_mask)
             if random_mod[6]:     # Rotate
-                angle = np.random.uniform(-180, 180)
+                angle = rng.uniform(-180, 180)
                 new_img = transforms.functional.rotate(new_img, angle=angle)
                 new_mask = transforms.functional.rotate(new_mask, angle=angle)
             if random_mod[7]:     # Crop
-                crop_size = tuple(int(np.random.uniform(3*x/4, x)) for x in img_size)             # [240; 320] to [480; 640]
+                crop_size = tuple(int(rng.uniform(3*x/4, x)) for x in img_size)             # [240; 320] to [480; 640]
                 params = transforms.RandomCrop.get_params(new_img, output_size=crop_size)
                 new_img = transforms.functional.crop(new_img, *params)
                 new_img = transforms.functional.resize(new_img, size=img_size)
@@ -83,7 +88,7 @@ def data_augment_(data, n: int, load_on_gpu: bool = False, verbose: bool = False
                 new_img = transforms.functional.affine(new_img, *params)
                 new_mask = transforms.functional.affine(new_mask, *params)
             if random_mod[9]:     # Z Axe Shift
-                scale = np.random.uniform(0, 0.1)
+                scale = rng.uniform(0, 0.1)
                 params = transforms.RandomPerspective.get_params(width=img_size[1], height=img_size[0], distortion_scale=scale)
                 new_img = transforms.functional.perspective(new_img, *params)
                 new_mask = transforms.functional.perspective(new_mask, *params)
@@ -198,13 +203,17 @@ class POCDataReader(object):
     def data(self):
         return self._data
 
-    def split(self, splits):
+    def split(self, splits, seed: int = None):
         assert len(splits) == 3, "Can only cut data into 3 samples"
         splits = np.floor(np.array(splits) * self.__len__()).astype(int)
 
         cut1 = splits[0]; cut2 = splits[0] + splits[1]
 
-        samples = np.random.permutation(self.__len__())
+        if seed is not None:
+            rng = np.random.RandomState(seed)
+        else:
+            rng = np.random
+        samples = rng.permutation(self.__len__())
         train_data = {i: self.data[k] for i, k in enumerate(samples[:cut1])}
         val_data = {i: self.data[k] for i, k in enumerate(samples[cut1:cut2])}
         test_data = {i: self.data[k] for i, k in enumerate(samples[cut2:])}

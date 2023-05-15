@@ -82,10 +82,10 @@ class Encoder(nn.Module):
     """Encoder: 4 DenseBlock  ~  (from DenseNet-201)"""
     def __init__(self, in_channels):
         super(Encoder, self).__init__()
-        self.block1 = DenseBlock(in_channels=in_channels, out_channels=64, n_conv=6, growth_rate=12)
-        self.block2 = DenseBlock(in_channels=64, out_channels=128, n_conv=12, growth_rate=12)
-        self.block3 = DenseBlock(in_channels=128, out_channels=256, n_conv=48, growth_rate=12)
-        self.block4 = DenseBlock(in_channels=256, out_channels=512, n_conv=32, growth_rate=12)
+        self.block1 = DenseBlock(in_channels=in_channels, out_channels=64, n_conv=6, growth_rate=16)
+        self.block2 = DenseBlock(in_channels=64, out_channels=128, n_conv=12, growth_rate=16)
+        self.block3 = DenseBlock(in_channels=128, out_channels=256, n_conv=48, growth_rate=16)
+        self.block4 = DenseBlock(in_channels=256, out_channels=512, n_conv=32, growth_rate=16)
 
     def forward(self, img):
         output1, x = self.block1(img)
