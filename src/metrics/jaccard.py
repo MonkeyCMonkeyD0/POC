@@ -24,6 +24,25 @@ class JaccardIndex(nn.Module):
         return (intersection / (union + self.smooth)).mean()
 
 
+class WeightJaccardIndex(nn.Module):
+    r"""The Jaccard index, also known as the Jaccard similarity coefficient or Intersection Over Union
+
+    .. math::
+        J(A,B) = \frac{|A \cap B|}{|A \cup B|} = \frac{|A \cap B|}{|A| + |B| - |A \cap B|}.
+    """
+    def __init__(self, smooth=1e-7):
+        super(WeightJaccardIndex, self).__init__()
+        self.register_buffer("smooth", torch.tensor(smooth, dtype=torch.float))
+
+    def forward(self, preds: torch.Tensor, targets: torch.Tensor):
+        intersection = torch.sum(targets * preds, dim=(0, 2, 3), dtype=torch.float)
+        union = torch.sum(targets, dim=(0, 2, 3), dtype=torch.float) + torch.sum(preds, dim=(0, 2, 3), dtype=torch.float) - intersection
+
+        prop_class = targets.mean(dim=(0, 2, 3))
+
+        return torch.sum(prop_class * intersection / (union + self.smooth))
+
+
 class PowerJaccardIndex(nn.Module):
     r"""The Power Jaccard index, from https://hal.science/hal-03139997/file/On_Power_losses_for_semantic_segmentation.pdf
 
