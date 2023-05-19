@@ -7,7 +7,7 @@ import warnings
 
 import torch
 from torchvision.io import read_image, ImageReadMode
-from torch.utils.data import Dataset, WeightedRandomSampler, default_collate
+from torch.utils.data import Dataset, WeightedRandomSampler
 from torchvision import transforms
 
 from my_utils import get_gpu_mem_usage, get_ram_usage
@@ -55,14 +55,14 @@ def data_augment_(data, n: int, load_on_gpu: bool = False, verbose: bool = False
             random_mod = rng.choice([0, 1], size=10, p=[.8, .2])    # Proba of 0.2 for each event = ~2 transformations
 
             # non-spacial variations (only on image)
-            if random_mod[0]:     # Brightness shift
-                new_img = transforms.ColorJitter(brightness=.5)(new_img)
-            if random_mod[1]:     # Autocontrast
-                new_img = transforms.functional.autocontrast(new_img)
-            if random_mod[2]:     # Sharpness
-                new_img = transforms.functional.adjust_sharpness(new_img, sharpness_factor=rng.uniform(0, 2))
-            if random_mod[3]:     # Gaussian Blur
-                new_img = transforms.functional.gaussian_blur(new_img, kernel_size=5)
+            # if random_mod[0]:     # Brightness shift
+            #     new_img = transforms.ColorJitter(brightness=.5)(new_img)
+            # if random_mod[1]:     # Autocontrast
+            #     new_img = transforms.functional.autocontrast(new_img)
+            # if random_mod[2]:     # Sharpness
+            #     new_img = transforms.functional.adjust_sharpness(new_img, sharpness_factor=rng.uniform(0, 2))
+            # if random_mod[3]:     # Gaussian Blur
+            #     new_img = transforms.functional.gaussian_blur(new_img, kernel_size=5)
 
             # spacial variations (on image & mask)
             img_size = transforms.functional.get_image_size(new_img)[::-1]
@@ -76,13 +76,13 @@ def data_augment_(data, n: int, load_on_gpu: bool = False, verbose: bool = False
                 angle = rng.uniform(-180, 180)
                 new_img = transforms.functional.rotate(new_img, angle=angle)
                 new_mask = transforms.functional.rotate(new_mask, angle=angle)
-            if random_mod[7]:     # Crop
-                crop_size = tuple(int(rng.uniform(3*x/4, x)) for x in img_size)             # [240; 320] to [480; 640]
-                params = transforms.RandomCrop.get_params(new_img, output_size=crop_size)
-                new_img = transforms.functional.crop(new_img, *params)
-                new_img = transforms.functional.resize(new_img, size=img_size)
-                new_mask = transforms.functional.crop(new_mask, *params)
-                new_mask = transforms.functional.resize(new_mask, size=img_size)
+            # if random_mod[7]:     # Crop
+            #     crop_size = tuple(int(rng.uniform(3*x/4, x)) for x in img_size)             # [240; 320] to [480; 640]
+            #     params = transforms.RandomCrop.get_params(new_img, output_size=crop_size)
+            #     new_img = transforms.functional.crop(new_img, *params)
+            #     new_img = transforms.functional.resize(new_img, size=img_size)
+            #     new_mask = transforms.functional.crop(new_mask, *params)
+            #     new_mask = transforms.functional.resize(new_mask, size=img_size)
             if random_mod[8]:     # Affine movement
                 params = transforms.RandomAffine.get_params(img_size=img_size, degrees=(-180, 180), translate=(0.1, 0.3), scale_ranges=(0.75, 1.), shears=(-10, 10))
                 new_img = transforms.functional.affine(new_img, *params)
@@ -129,6 +129,7 @@ class POCDataset(Dataset):
 
         if self.transform:
             img = self.transform(img)
+
         if self.target_transform:
             mask = self.target_transform(mask)
 
@@ -184,9 +185,17 @@ class POCDataReader(object):
             if limit is not None and i >= limit:
                 break
 
+            resize = transforms.RandomCrop(size=(256, 256))
+
             img = read_image(img_path, mode=ImageReadMode.UNCHANGED)
             mask = read_image(mask_path, mode=ImageReadMode.GRAY)
             file_name = os.path.basename(img_path)
+
+            rng_state = torch.get_rng_state()
+            img = resize(img)
+            torch.set_rng_state(rng_state)
+            mask = resize(mask)
+
             if self.load_on_gpu:
                 self._data[i] = (img.cuda(), mask.cuda(), file_name)
             else:

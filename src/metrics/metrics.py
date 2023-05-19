@@ -5,7 +5,7 @@ from torch import nn
 from torch.utils.tensorboard import SummaryWriter
 
 from .dice import DiceIndex
-from .jaccard import JaccardIndex
+from .jaccard import JaccardIndex, WeightJaccardIndex
 from .tversky import TverskyIndex
 
 
@@ -19,10 +19,12 @@ class Metrics(nn.Module):
         self.register_buffer("_losses", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
         self.register_buffer("_scores_crack_IOU", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
         self.register_buffer("_scores_mean_IOU", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
+        self.register_buffer("_scores_weighted_IOU", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
         self.register_buffer("_scores_Tversky", torch.zeros(buffer_size, dtype=torch.float, device=self.device))
 
         self.jaccardCrackIndex = JaccardIndex(mesure_background=False, smooth=smooth).to(self.device)
         self.jaccardMeanIndex = JaccardIndex(mesure_background=True, smooth=smooth).to(self.device)
+        self.jaccardWeightIndex = WeightJaccardIndex(smooth=smooth).to(self.device)
         self.tverskyIndex = TverskyIndex(alpha=.3, beta=.7, smooth=smooth).to(self.device)
 
         self.hyperparameters = {}
@@ -53,6 +55,10 @@ class Metrics(nn.Module):
     @property
     def meanIoU(self):
         return self._scores_mean_IOU.mean()
+    
+    @property
+    def weightIoU(self):
+        return self._scores_weighted_IOU.mean()
 
     @property
     def tversky(self):
@@ -68,6 +74,7 @@ class Metrics(nn.Module):
         self._losses[batch_index] = loss_value
         self._scores_crack_IOU[batch_index] = self.jaccardCrackIndex(preds, targets)
         self._scores_mean_IOU[batch_index] = self.jaccardMeanIndex(preds, targets)
+        self._scores_weighted_IOU[batch_index] = self.jaccardWeightIndex(preds, targets)
         self._scores_Tversky[batch_index] = self.tverskyIndex(preds, targets)
 
         return self._scores_crack_IOU[batch_index]
@@ -82,6 +89,7 @@ class Metrics(nn.Module):
         self.writer.add_scalar(loss_name, self.loss, epoch, new_style=True)
         self.writer.add_scalar("Indexes/Crack IOU", self.crackIoU, epoch, new_style=True)
         self.writer.add_scalar("Indexes/Mean IOU", self.meanIoU, epoch, new_style=True)
+        self.writer.add_scalar("Indexes/Weight IOU", self.weightIoU, epoch, new_style=True)
         self.writer.add_scalar("Indexes/Tversky", self.tversky, epoch, new_style=True)
         if lr is not None:
             self.writer.add_scalar("Learning Rate", lr, epoch, new_style=True)
@@ -111,6 +119,7 @@ class EvaluationMetrics(Metrics):
             metric_dict={
                 "Crack IOU": self.crackIoU, 
                 "Mean IOU": self.meanIoU,
+                "Weight IOU": self.weightIoU,
                 "Tversky": self.tversky},
             run_name=".")
 
