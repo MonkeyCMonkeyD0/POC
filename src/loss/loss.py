@@ -44,8 +44,11 @@ class MultiscaleLoss(nn.Module):
     def __str__(self):
         return f"{self.__class__.__name__}:{str(self.loss_function)}"
 
-    def forward(self, preds_tuple: (torch.Tensor), targets: torch.Tensor):
-        loss = torch.tensor(0.).to(preds_tuple[0].device)
-        for pred in preds_tuple:
-            loss += self.loss_function(pred, targets)
-        return loss
+    def forward(self, preds, targets: torch.Tensor):
+        if isinstance(preds, tuple):
+            loss = torch.tensor(0.).to(preds[0].device)
+            for pred in preds:
+                loss += self.loss_function(pred, targets)
+            return loss
+        else:
+            return self.loss_function(preds, targets)
