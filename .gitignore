@@ -1,6 +1,7 @@
 ### CUSTOM RULES ###
 logs*
 ray_results
+data
 ### ~~~~~~~~~~~~ ###
 
 # Byte-compiled / optimized / DLL files

@@ -3,9 +3,9 @@ from torch import nn
 from torch.nn import functional as F
 
 
-class CombinedLoss(nn.Module):
+class MeanLoss(nn.Module):
     def __init__(self, loss1, loss2, ratio=.5):
-        super(CombinedLoss, self).__init__()
+        super(MeanLoss, self).__init__()
         self.loss1 = loss1
         self.loss2 = loss2
         self.ratio = ratio
