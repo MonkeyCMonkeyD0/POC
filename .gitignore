@@ -1,4 +1,5 @@
 ### CUSTOM RULES ###
+.Trash-1000/
 logs*
 ray_results
 data
