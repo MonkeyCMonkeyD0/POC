@@ -41,12 +41,12 @@ class BorderedLoss(nn.Module):
         return borders
 
     def forward(self, preds: torch.Tensor, targets: torch.Tensor):
-        volume_loss_val = self.ratio * self.volume_loss(preds, targets)
+        volume_loss_val = (1 - self.ratio) * self.volume_loss(preds, targets)
 
         borders = self.create_border_mask(targets)
         emphasized_preds = preds * borders
         emphasized_targets = targets * borders
 
-        border_loss_val = (1 - self.ratio) * self.border_loss(emphasized_preds, emphasized_targets)
+        border_loss_val = self.ratio * self.border_loss(emphasized_preds, emphasized_targets)
 
         return volume_loss_val + border_loss_val
