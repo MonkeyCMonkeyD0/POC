@@ -52,46 +52,31 @@ def data_augment_(data, n: int, load_on_gpu: bool = False, verbose: bool = False
                 new_img = new_img.cuda()
                 new_mask = new_mask.cuda()
 
-            random_mod = rng.choice([0, 1], size=10, p=[.8, .2])    # Proba of 0.2 for each event = ~2 transformations
+            random_mod_nsp = rng.choice([0, 1], size=4, p=[3/4, 1/4])    # Proba of 0.25 for each event = ~1 transformations
+            random_mod_sp = rng.choice([0, 1], size=3, p=[2/3, 1/3])    # Proba of 1/3 for each event = ~1 transformations
 
             # non-spacial variations (only on image)
-            # if random_mod[0]:     # Brightness shift
-            #     new_img = transforms.ColorJitter(brightness=.5)(new_img)
-            # if random_mod[1]:     # Autocontrast
-            #     new_img = transforms.functional.autocontrast(new_img)
-            # if random_mod[2]:     # Sharpness
-            #     new_img = transforms.functional.adjust_sharpness(new_img, sharpness_factor=rng.uniform(0, 2))
-            # if random_mod[3]:     # Gaussian Blur
-            #     new_img = transforms.functional.gaussian_blur(new_img, kernel_size=5)
+            if random_mod_nsp[0]:     # Brightness shift
+                new_img = transforms.ColorJitter(brightness=.5)(new_img)
+            if random_mod_nsp[1]:     # Autocontrast
+                new_img = transforms.functional.autocontrast(new_img)
+            if random_mod_nsp[2]:     # Sharpness
+                new_img = transforms.functional.adjust_sharpness(new_img, sharpness_factor=rng.uniform(0, 2))
+            if random_mod_nsp[3]:     # Gaussian Blur
+                new_img = transforms.functional.gaussian_blur(new_img, kernel_size=5)
 
             # spacial variations (on image & mask)
             img_size = transforms.functional.get_image_size(new_img)[::-1]
-            if random_mod[4]:     # Flip
+            if random_mod_sp[0]:     # Flip
                 new_img = transforms.functional.vflip(new_img)
                 new_mask = transforms.functional.vflip(new_mask)
-            if random_mod[5]:     # Mirror
+            if random_mod_sp[1]:     # Mirror
                 new_img = transforms.functional.hflip(new_img)
                 new_mask = transforms.functional.hflip(new_mask)
-            if random_mod[6]:     # Rotate
-                angle = rng.uniform(-180, 180)
+            if random_mod_sp[2]:     # Rotate
+                angle = 90 * rng.randint(1, 4)
                 new_img = transforms.functional.rotate(new_img, angle=angle)
                 new_mask = transforms.functional.rotate(new_mask, angle=angle)
-            # if random_mod[7]:     # Crop
-            #     crop_size = tuple(int(rng.uniform(3*x/4, x)) for x in img_size)             # [240; 320] to [480; 640]
-            #     params = transforms.RandomCrop.get_params(new_img, output_size=crop_size)
-            #     new_img = transforms.functional.crop(new_img, *params)
-            #     new_img = transforms.functional.resize(new_img, size=img_size)
-            #     new_mask = transforms.functional.crop(new_mask, *params)
-            #     new_mask = transforms.functional.resize(new_mask, size=img_size)
-            if random_mod[8]:     # Affine movement
-                params = transforms.RandomAffine.get_params(img_size=img_size, degrees=(-180, 180), translate=(0.1, 0.3), scale_ranges=(0.75, 1.), shears=(-10, 10))
-                new_img = transforms.functional.affine(new_img, *params)
-                new_mask = transforms.functional.affine(new_mask, *params)
-            if random_mod[9]:     # Z Axe Shift
-                scale = rng.uniform(0, 0.1)
-                params = transforms.RandomPerspective.get_params(width=img_size[1], height=img_size[0], distortion_scale=scale)
-                new_img = transforms.functional.perspective(new_img, *params)
-                new_mask = transforms.functional.perspective(new_mask, *params)
 
             data[original_dataset_lenght + idx * n + i_n] = (new_img, new_mask, original_file)
 
@@ -190,6 +175,10 @@ class POCDataReader(object):
             img = read_image(img_path, mode=ImageReadMode.UNCHANGED)
             mask = read_image(mask_path, mode=ImageReadMode.GRAY)
             file_name = os.path.basename(img_path)
+
+            if img.size(1) < 256 or img.size(2) < 256:
+                img = transforms.functional.resize(img, size=(256,256))
+                mask = transforms.functional.resize(mask, size=(256,256))
 
             rng_state = torch.get_rng_state()
             img = resize(img)
