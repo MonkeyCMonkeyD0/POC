@@ -4,36 +4,39 @@ from torchvision.transforms import Compose
 
 
 class InputPipeline(nn.Module):
-    def __init__(self, transformer = None, layer_transformer = None):
+    def __init__(self, filter = None, additional_channel = None):
         super().__init__()
 
-        if isinstance(transformer, list):
-            self.transformer = transformer
-        elif transformer is None:
-            self.transformer = None
+        if isinstance(filter, list):
+            self.filter = filter
+        elif filter is None:
+            self.filter = None
         else:
-            self.transformer = [transformer]
+            self.filter = [filter]
 
-        if isinstance(layer_transformer, list):
-            self.layer_transformer = nn.ModuleList(layer_transformer)
-        elif isinstance(layer_transformer, nn.Module):
-            self.layer_transformer = nn.ModuleList([layer_transformer])
+        if isinstance(additional_channel, list):
+            self.additional_channel = nn.ModuleList(additional_channel)
+        elif isinstance(additional_channel, nn.Module):
+            self.additional_channel = nn.ModuleList([additional_channel])
         else:
-            self.layer_transformer = None
+            self.additional_channel = None
 
-        self._nb_channel = 3 + (len(self.layer_transformer) if self.layer_transformer is not None else 0)
+        self._nb_channel = (len(self.filter) if self.filter is not None else 3) + (len(self.additional_channel) if self.additional_channel is not None else 0)
 
     @torch.inference_mode()
     def forward(self, img):
-        n_channel = img.shape[-3]
-        if self.layer_transformer is not None:
-            for transform in self.layer_transformer:
-                new_channel = transform(img[0:n_channel])
+        if self.filter is not None:
+            new_img = Compose(self.filter)(img)
+        else:
+            new_img = img.clone()
+
+        if self.additional_channel is not None:
+            for transform in self.additional_channel:
+                new_channel = transform(img)
                 new_channel = (new_channel - new_channel.min()) / new_channel.max()
-                img = torch.cat((img, new_channel), dim=-3) 
-        if self.transformer is not None:
-            img[0:n_channel] = Compose(self.transformer)(img[0:n_channel])
-        return img
+                new_img = torch.cat((new_img, new_channel), dim=-3)
+
+        return new_img
 
     @property
     def nb_channel(self):
@@ -41,11 +44,11 @@ class InputPipeline(nn.Module):
 
     def get_names(self):
         return (self.__class__.__name__,
-            ",".join([t.__name__ for t in self.transformer]) if self.transformer is not None else " ",
-            ",".join([str(t) for t in self.layer_transformer]) if self.layer_transformer is not None else " ")
+            ",".join([t.__name__ for t in self.filter]) if self.filter is not None else " ",
+            ",".join([str(t) for t in self.additional_channel]) if self.additional_channel is not None else " ")
         
     def __str__(self):
         return "{}({}+{})".format(
             self.__class__.__name__,
-            ",".join([t.__name__ for t in self.transformer]) if self.transformer is not None else " ",
-            ",".join([str(t) for t in self.layer_transformer]) if self.layer_transformer is not None else " ")
+            ",".join([t.__name__ for t in self.filter]) if self.filter is not None else " ",
+            ",".join([str(t) for t in self.additional_channel]) if self.additional_channel is not None else " ")
