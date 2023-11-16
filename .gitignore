@@ -1,8 +1,9 @@
 ### CUSTOM RULES ###
 .Trash-1000/
 logs*
-ray_results
+ray_results/
 data/
+!data/download_dataset.sh
 ### ~~~~~~~~~~~~ ###
 
 
