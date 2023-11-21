@@ -20,17 +20,20 @@ The creation of the Pohang Crack (POC) dataset was motivated by the need for a c
 
 You can download the POC dataset from the following links, (or use the script presented later to automaticaly download it)
 
-```text
-POC dataset:     [https://link.to.dataset]()
-POC-ori dataset: [https://link.to.dataset]()
-POC-9k dataset:  [https://link.to.dataset]()
-```
+<big><pre>
+POC dataset:     [https://drive.google.com/file/d/1CIhofqCNqMOlFyPqg5gAAMO3UoxNe8qy/view](https://drive.google.com/file/d/1CIhofqCNqMOlFyPqg5gAAMO3UoxNe8qy/view)
+POC-ori dataset: [https://drive.google.com/file/d/1WxfEDmMQq_Q-y6kC8HdNl4nI8rHS2Ujo/view](https://drive.google.com/file/d/1WxfEDmMQq_Q-y6kC8HdNl4nI8rHS2Ujo/view)
+POC-9k dataset:  [https://drive.google.com/file/d/1Nn7P7PBXfYpOFL3E3A8b7yhF9kqlV6n4/view](https://drive.google.com/file/d/1Nn7P7PBXfYpOFL3E3A8b7yhF9kqlV6n4/view)
+</pre></big>
 
 ### Guide Filter & SubUNet
 
 - Our Guide Filter method, employs esteemed filters including Sobel, Laplacian, Frangi, and Sato to preprocess images for the training phase. By adding an auxiliary layer to the original RGB images, these filters can enrich the input image’s edge, shape, volume and textures.
 - We used SubUNet, which incorporates a Pyramid Pooling Module to capture a wider range of spatial details. This integration enables accurate segmentation of intricate crack patterns and the architecture’s adaptability and performance in handling detailed structural variations within the segmentation task.
-![Guide Filter](figures/fig2_guide_filter.png)  |  ![SubUNet](figures/fig4_subunet_architecture.png)
+<p float="center">
+  <img src="figures/fig2_guide_filter.png" width="49%" />
+  <img src="figures/fig4_subunet_architecture.png" width="49%" /> 
+</p>
 
 ### Results
 
@@ -56,7 +59,7 @@ conda install jupyter
 
 ### Downloading the Dataset
 
-The dataset for this training is hosted on Google Drive at ([https://link.to.dataset]()) and can be automatically downloaded by running this script.
+The dataset for this training is hosted on Google Drive at ([https://drive.google.com/file/d/1CIhofqCNqMOlFyPqg5gAAMO3UoxNe8qy/view](https://drive.google.com/file/d/1CIhofqCNqMOlFyPqg5gAAMO3UoxNe8qy/view)) and can be automatically downloaded by running this script.
 
 ```bash
 cd data; ./download_dataset.sh
