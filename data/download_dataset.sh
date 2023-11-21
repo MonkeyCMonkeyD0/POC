@@ -1,8 +1,9 @@
 #!/bin/bash
 
-dataset_id="1Ts4xRnxOCklxOkuiOeKEUIzRHv4whL09"
+dataset_id="1Nn7P7PBXfYpOFL3E3A8b7yhF9kqlV6n4"
 
-google_drive_link="https://drive.google.com/uc?export=download&id=$dataset_id"
+google_drive_link="https://drive.google.com/uc?export=download&id=$dataset_id&confirm=t"
 
-curl -LO $google_drive_link
-echo $google_drive_link
+curl -L $google_drive_link > dataset.zip
+
+unzip dataset.zip -d ./
