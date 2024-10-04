@@ -1,11 +1,11 @@
-# From Deep Learning to Deep Understanding: Comprehensive Study on Crack Segmentation with Dataset, Guide Filter, Model and Loss
+# Deep Learning to Deep Understanding: Study on Crack Segmentation regarding Dataset, Filter, Model and Loss
 
 This repository contains the code & the graphs used to redact the research paper.
 
-Soo Min Lee, Tristan Michel, Gyeong Young Kim, Byeong-il Hwang, DongJu Kim, From Deep Learning to Deep Understanding: Comprehensive Study on Crack Segmentation with Dataset, Guide Filter, Model and Loss, Pattern Recognition, vol. X, no. X, pp. X-X, 2023. [[PDF]](https://link.to.pdf)
+Soo Min Lee, Tristan Michel, Gyeong Young Kim, Byeong-il Hwang, DongJu Kim, Deep Learning to Deep Understanding: Study on Crack Segmentation regarding Dataset, Filter, Model and Loss, Image and Vision Computing, vol. X, no. X, pp. X-X, 2024. [[PDF]](https://link.to.pdf)
 
 ##### Abstract:
-Crack segmentation is crucial in computer vision for detecting infrastructure defects. We introduce the Pohang Crack (POC) dataset, featuring 4,606 im- ages, combining publicly sourced and locally captured data in Pohang, Korea. A novel Magicwand labelling technique is introduced, offering significant im- provement in dataset quality in the domain. Our study integrates a Guide Filter preprocessing step, develops the SubUNet architecture, and proposes a Mean Loss function specific to crack segmentation challenges. Evaluat- ing these innovations using the Crack Intersection over Union (IoU) metric to address pixel imbalance, Magicwand labelling method resulted in a 14.6% performance enhancement over automated and manual labelling methods. In direct comparisons against compared models, SubUNet demonstrated preci- sion, achieving its peak performance of 61.23% Crack IoU, when trained with both Mean Loss and the Guide Filter
+Crack segmentation plays a critical role in computer vision, particularly for detecting defects in infrastructure. This paper introduces a novel crack dataset and a specialized crack segmentation network, SubUNet, trained with specific configurations. The Pohang Crack (POC) dataset includes 4606 images sourced both publicly and locally from Pohang, Korea. To enhance dataset quality, we utilize the Magicwand labeling method, resulting in a 14.6% improvement in performance compared to the automated and manual labeling method of CrackSeg9k. SubUNet, incorporating the Pyramid Pooling Module into the UNet architecture, achieved better precision and spatial representation. In our comparative analysis of crack segmentation networks—DeepCrack, UNet, and SubUNet—we integrate the Mean loss function and Guide Filter layer in various configurations. Among the networks, those trained with Mean loss function, using a ratio of 0.25 pixel loss with 0.75 volume loss, and a Guide Filter derived from the Sum filter, which fuses the advantages of the Frangi and Sato filters, performed as the top-1 model in each network. SubUNet demonstrated superior precision in direct comparisons, achieving its peak performance with a Crack IoU of 61.23%.
 
 ### The POC dataset: a comprehensive collection of 4,606 pixel-wise annotated images showcasing a wide variety of real-world surfaces
 
@@ -103,18 +103,18 @@ If you use our codes or datasets in your own research, the citation can be place
 
 ```latex
 @article{X,
-  title={From Deep Learning to Deep Understanding: Comprehensive Study on Crack Segmentation with Dataset, Guide Filter, Model and Loss},
+  title={Deep Learning to Deep Understanding: Study on Crack Segmentation regarding Dataset, Filter, Model and Loss},
   author={Soo Min Lee, Tristan Michel, Gyeong Young Kim, Byeong-il Hwang, DongJu Kim},
-  journal={Pattern Recognition},
+  journal={Image and Vision Computing},
   volume={X},
   number={X},
   pages={X--X},
-  year={2023},
+  year={2024},
   issn={X-X},
   doi={https://X},
   url={https://X},
   keywords={Crack Segmentation, Data Annotation, Guide Filter, Pyramid Pooling Module, Mean Loss},
-  abstract={Crack segmentation is crucial in computer vision for detecting infrastructure defects. We introduce the Pohang Crack (POC) dataset, featuring 4,606 images, combining publicly sourced and locally captured data in Pohang, Korea. A novel Magicwand labelling technique is introduced, offering significant improvement in dataset quality in the domain. Our study integrates a Guide Filter preprocessing step, develops the SubUNet architecture, and proposes a Mean Loss function specific to crack segmentation challenges. Evaluating these innovations using the Crack Intersection over Union (IoU) metric to address pixel imbalance, Magicwand labelling method resulted in a 14.6\% performance enhancement over automated and manual labelling methods. In direct comparisons against compared models, SubUNet demonstrated precision, achieving its peak performance of 61.23\% Crack IoU, when trained with both Mean Loss and the Guide Filter.},
+  abstract={Crack segmentation plays a critical role in computer vision, particularly for detecting defects in infrastructure. This paper introduces a novel crack dataset and a specialized crack segmentation network, SubUNet, trained with specific configurations. The Pohang Crack (POC) dataset includes 4606 images sourced both publicly and locally from Pohang, Korea. To enhance dataset quality, we utilize the Magicwand labeling method, resulting in a 14.6% improvement in performance compared to the automated and manual labeling method of CrackSeg9k. SubUNet, incorporating the Pyramid Pooling Module into the UNet architecture, achieved better precision and spatial representation. In our comparative analysis of crack segmentation networks—DeepCrack, UNet, and SubUNet—we integrate the Mean loss function and Guide Filter layer in various configurations. Among the networks, those trained with Mean loss function, using a ratio of 0.25 pixel loss with 0.75 volume loss, and a Guide Filter derived from the Sum filter, which fuses the advantages of the Frangi and Sato filters, performed as the top-1 model in each network. SubUNet demonstrated superior precision in direct comparisons, achieving its peak performance with a Crack IoU of 61.23%.},
 }
 ```
 
