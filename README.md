@@ -1,9 +1,10 @@
 # Deep Learning to Deep Understanding: Comprehensive Study on Crack Segmentation with Dataset, Guide Filter, Model and Loss (Work in progress)
 
-Soo Min Lee, Tristan Michel, Gyeong Young Kim, Byeong-il Hwang, DongJu Kim, Deep Learning to Deep Understanding: Study on Crack Segmentation regarding Dataset, Filter, Model and Loss, Image and Vision Computing, vol. X, no. X, pp. X-X, 2024. [[PDF]](https://link.to.pdf)
+Soo Min Lee, Tristan Michel, Gyeong Young Kim, Byeong-il Hwang, DongJu Kim, Deep Learning to Deep Understanding: Study on Crack Segmentation regarding Dataset, Filter, Model and Loss, XXX, vol. X, no. X, pp. X-X, 2024. [[PDF]](https://link.to.pdf)
 
 ##### Abstract:
-Crack segmentation plays a critical role in computer vision, particularly for detecting defects in infrastructure. This paper introduces a novel crack dataset and a specialized crack segmentation network, SubUNet, trained with specific configurations. The Pohang Crack (POC) dataset includes 4606 images sourced both publicly and locally from Pohang, Korea. To enhance dataset quality, we utilize the Magicwand labeling method, resulting in a 14.6% improvement in performance compared to the automated and manual labeling method of CrackSeg9k. SubUNet, incorporating the Pyramid Pooling Module into the UNet architecture, achieved better precision and spatial representation. In our comparative analysis of crack segmentation networks—DeepCrack, UNet, and SubUNet—we integrate the Mean loss function and Guide Filter layer in various configurations. Among the networks, those trained with Mean loss function, using a ratio of 0.25 pixel loss with 0.75 volume loss, and a Guide Filter derived from the Sum filter, which fuses the advantages of the Frangi and Sato filters, performed as the top-1 model in each network. SubUNet demonstrated superior precision in direct comparisons, achieving its peak performance with a Crack IoU of 61.23%.
+Crack segmentation plays a critical role in computer vision, particularly for detecting defects in infrastructure. This paper presents a novel crack segmentation network, SubUNet, and the Pohang Crack (POC) dataset, which includes 4606 images collected
+from both public sources and Pohang, Korea. The dataset quality was enhanced using the Magicwand labeling technique, leading to a 14.6% improvement in performance compared to the CrackSeg9k dataset. SubUNet, which integrates a Pyramid Pooling Module into the UNet architecture, achieved superior precision and spatial representation. A comparative analysis of DeepCrack, UNet, and SubUNet using various configurations, including the Mean loss function (0.25 pixel loss, 0.75 volume loss) and a Guide Filter layer based on the Sum filter (combining Frangi and Sato filters), revealed that SubUNet achieved the best performance with a Crack IoU of 61.23%, outperforming other models and demonstrating the effectiveness of its design for crack segmentation tasks.
 
 ### The POC dataset: a comprehensive collection of 4,606 pixel-wise annotated images showcasing a wide variety of real-world surfaces
 
@@ -81,7 +82,7 @@ If you use our codes or datasets in your own research, the citation can be place
 @article{X,
   title={Deep Learning to Deep Understanding: Study on Crack Segmentation regarding Dataset, Filter, Model and Loss},
   author={Soo Min Lee, Tristan Michel, Gyeong Young Kim, Byeong-il Hwang, DongJu Kim},
-  journal={Image and Vision Computing},
+  journal={XXX},
   volume={X},
   number={X},
   pages={X--X},
